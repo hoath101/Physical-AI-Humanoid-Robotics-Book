@@ -48,7 +48,6 @@ UserSettings/
 # *.meta - Be careful with this, as .meta files are important for Unity assets.
 # Only ignore if specifically known to be generated/temporary.
 # For now, excluding to prevent accidental asset loss.
-build/
 
 # General
 .DS_Store
