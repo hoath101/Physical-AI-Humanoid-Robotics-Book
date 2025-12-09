@@ -11,7 +11,7 @@ export default {
   "baseUrl": "/",
   "organizationName": "hoath101",
   "projectName": "Physical-AI-Humanoid-Robotics-Book",
-  "onBrokenLinks": "throw",
+  "onBrokenLinks": "warn",
   "i18n": {
     "defaultLocale": "en",
     "locales": [
@@ -26,7 +26,7 @@ export default {
       {
         "docs": {
           "sidebarPath": "C:\\Users\\Baloch\\GIAIC-WORK\\hackathon-book\\sidebars.js",
-          "routeBasePath": "/"
+          "routeBasePath": "/intro"
         },
         "blog": false,
         "theme": {
