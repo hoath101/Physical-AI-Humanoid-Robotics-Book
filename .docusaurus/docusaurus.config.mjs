@@ -26,7 +26,7 @@ export default {
       {
         "docs": {
           "sidebarPath": "C:\\Users\\Baloch\\GIAIC-WORK\\hackathon-book\\sidebars.js",
-          "routeBasePath": "/intro"
+          "routeBasePath": "/"
         },
         "blog": false,
         "theme": {

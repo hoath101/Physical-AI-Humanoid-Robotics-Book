@@ -3,240 +3,240 @@ import ComponentCreator from '@docusaurus/ComponentCreator';
 
 export default [
   {
-    path: '/intro',
-    component: ComponentCreator('/intro', 'c7c'),
+    path: '/',
+    component: ComponentCreator('/', 'b02'),
     routes: [
       {
-        path: '/intro',
-        component: ComponentCreator('/intro', '235'),
+        path: '/',
+        component: ComponentCreator('/', '05a'),
         routes: [
           {
-            path: '/intro',
-            component: ComponentCreator('/intro', '94c'),
+            path: '/',
+            component: ComponentCreator('/', 'a99'),
             routes: [
               {
-                path: '/intro/capstone-project/',
-                component: ComponentCreator('/intro/capstone-project/', '657'),
+                path: '/capstone-project/',
+                component: ComponentCreator('/capstone-project/', 'c4c'),
                 exact: true
               },
               {
-                path: '/intro/capstone-project/autonomous-humanoid',
-                component: ComponentCreator('/intro/capstone-project/autonomous-humanoid', '569'),
+                path: '/capstone-project/autonomous-humanoid',
+                component: ComponentCreator('/capstone-project/autonomous-humanoid', '81e'),
                 exact: true
               },
               {
-                path: '/intro/intro',
-                component: ComponentCreator('/intro/intro', '096'),
+                path: '/intro',
+                component: ComponentCreator('/intro', '9fa'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-1-ros2/',
-                component: ComponentCreator('/intro/module-1-ros2/', 'd61'),
+                path: '/module-1-ros2/',
+                component: ComponentCreator('/module-1-ros2/', 'a0f'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-1-ros2/installation-setup',
-                component: ComponentCreator('/intro/module-1-ros2/installation-setup', '45a'),
+                path: '/module-1-ros2/installation-setup',
+                component: ComponentCreator('/module-1-ros2/installation-setup', '9b8'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-1-ros2/nodes-topics-services',
-                component: ComponentCreator('/intro/module-1-ros2/nodes-topics-services', '37b'),
+                path: '/module-1-ros2/nodes-topics-services',
+                component: ComponentCreator('/module-1-ros2/nodes-topics-services', '332'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-1-ros2/practical-exercises',
-                component: ComponentCreator('/intro/module-1-ros2/practical-exercises', 'e51'),
+                path: '/module-1-ros2/practical-exercises',
+                component: ComponentCreator('/module-1-ros2/practical-exercises', 'b25'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-1-ros2/rclpy-basics',
-                component: ComponentCreator('/intro/module-1-ros2/rclpy-basics', 'ca5'),
+                path: '/module-1-ros2/rclpy-basics',
+                component: ComponentCreator('/module-1-ros2/rclpy-basics', '66f'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-1-ros2/urdf-description',
-                component: ComponentCreator('/intro/module-1-ros2/urdf-description', '3e1'),
+                path: '/module-1-ros2/urdf-description',
+                component: ComponentCreator('/module-1-ros2/urdf-description', '24f'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/',
-                component: ComponentCreator('/intro/module-2-digital-twin/', 'a8a'),
+                path: '/module-2-digital-twin/',
+                component: ComponentCreator('/module-2-digital-twin/', 'ad3'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/gazebo-simulation',
-                component: ComponentCreator('/intro/module-2-digital-twin/gazebo-simulation', 'a7a'),
+                path: '/module-2-digital-twin/gazebo-simulation',
+                component: ComponentCreator('/module-2-digital-twin/gazebo-simulation', '9ad'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/gazebo-world-setup',
-                component: ComponentCreator('/intro/module-2-digital-twin/gazebo-world-setup', 'd8f'),
+                path: '/module-2-digital-twin/gazebo-world-setup',
+                component: ComponentCreator('/module-2-digital-twin/gazebo-world-setup', '904'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/physics-collisions',
-                component: ComponentCreator('/intro/module-2-digital-twin/physics-collisions', '7f8'),
+                path: '/module-2-digital-twin/physics-collisions',
+                component: ComponentCreator('/module-2-digital-twin/physics-collisions', '6ec'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/practical-exercises',
-                component: ComponentCreator('/intro/module-2-digital-twin/practical-exercises', '769'),
+                path: '/module-2-digital-twin/practical-exercises',
+                component: ComponentCreator('/module-2-digital-twin/practical-exercises', '5b4'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/sensor-simulation',
-                component: ComponentCreator('/intro/module-2-digital-twin/sensor-simulation', 'bfd'),
+                path: '/module-2-digital-twin/sensor-simulation',
+                component: ComponentCreator('/module-2-digital-twin/sensor-simulation', 'aaa'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/unity-scene-setup',
-                component: ComponentCreator('/intro/module-2-digital-twin/unity-scene-setup', 'e96'),
+                path: '/module-2-digital-twin/unity-scene-setup',
+                component: ComponentCreator('/module-2-digital-twin/unity-scene-setup', '480'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/unity-visualization',
-                component: ComponentCreator('/intro/module-2-digital-twin/unity-visualization', '9da'),
+                path: '/module-2-digital-twin/unity-visualization',
+                component: ComponentCreator('/module-2-digital-twin/unity-visualization', 'bc9'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-2-digital-twin/urdf-validation',
-                component: ComponentCreator('/intro/module-2-digital-twin/urdf-validation', '944'),
+                path: '/module-2-digital-twin/urdf-validation',
+                component: ComponentCreator('/module-2-digital-twin/urdf-validation', '37b'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/',
-                component: ComponentCreator('/intro/module-3-ai-perception/', '3ad'),
+                path: '/module-3-ai-perception/',
+                component: ComponentCreator('/module-3-ai-perception/', 'b15'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/installation-setup',
-                component: ComponentCreator('/intro/module-3-ai-perception/installation-setup', '45b'),
+                path: '/module-3-ai-perception/installation-setup',
+                component: ComponentCreator('/module-3-ai-perception/installation-setup', '0d6'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/isaac-sim',
-                component: ComponentCreator('/intro/module-3-ai-perception/isaac-sim', 'a97'),
+                path: '/module-3-ai-perception/isaac-sim',
+                component: ComponentCreator('/module-3-ai-perception/isaac-sim', 'b8e'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/isaac-sim-fundamentals',
-                component: ComponentCreator('/intro/module-3-ai-perception/isaac-sim-fundamentals', '1d5'),
+                path: '/module-3-ai-perception/isaac-sim-fundamentals',
+                component: ComponentCreator('/module-3-ai-perception/isaac-sim-fundamentals', '7fa'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/nav2-locomotion',
-                component: ComponentCreator('/intro/module-3-ai-perception/nav2-locomotion', '7f0'),
+                path: '/module-3-ai-perception/nav2-locomotion',
+                component: ComponentCreator('/module-3-ai-perception/nav2-locomotion', 'c24'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/navigation-planning-obstacle-avoidance',
-                component: ComponentCreator('/intro/module-3-ai-perception/navigation-planning-obstacle-avoidance', '847'),
+                path: '/module-3-ai-perception/navigation-planning-obstacle-avoidance',
+                component: ComponentCreator('/module-3-ai-perception/navigation-planning-obstacle-avoidance', 'c6b'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/object-detection-localization',
-                component: ComponentCreator('/intro/module-3-ai-perception/object-detection-localization', 'edb'),
+                path: '/module-3-ai-perception/object-detection-localization',
+                component: ComponentCreator('/module-3-ai-perception/object-detection-localization', 'c99'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/perception-navigation-pipeline-diagrams',
-                component: ComponentCreator('/intro/module-3-ai-perception/perception-navigation-pipeline-diagrams', '4d2'),
+                path: '/module-3-ai-perception/perception-navigation-pipeline-diagrams',
+                component: ComponentCreator('/module-3-ai-perception/perception-navigation-pipeline-diagrams', '15f'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/practical-exercises-isaac-ai',
-                component: ComponentCreator('/intro/module-3-ai-perception/practical-exercises-isaac-ai', '6b3'),
+                path: '/module-3-ai-perception/practical-exercises-isaac-ai',
+                component: ComponentCreator('/module-3-ai-perception/practical-exercises-isaac-ai', 'b60'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-3-ai-perception/vslam-navigation',
-                component: ComponentCreator('/intro/module-3-ai-perception/vslam-navigation', '6e1'),
+                path: '/module-3-ai-perception/vslam-navigation',
+                component: ComponentCreator('/module-3-ai-perception/vslam-navigation', 'b3e'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/',
-                component: ComponentCreator('/intro/module-4-vla/', 'aed'),
+                path: '/module-4-vla/',
+                component: ComponentCreator('/module-4-vla/', 'f30'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/humanoid-locomotion-control',
-                component: ComponentCreator('/intro/module-4-vla/humanoid-locomotion-control', '7c6'),
+                path: '/module-4-vla/humanoid-locomotion-control',
+                component: ComponentCreator('/module-4-vla/humanoid-locomotion-control', '645'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/isaac-ros-integration',
-                component: ComponentCreator('/intro/module-4-vla/isaac-ros-integration', '280'),
+                path: '/module-4-vla/isaac-ros-integration',
+                component: ComponentCreator('/module-4-vla/isaac-ros-integration', 'c38'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/isaac-sim-fundamentals',
-                component: ComponentCreator('/intro/module-4-vla/isaac-sim-fundamentals', 'a67'),
+                path: '/module-4-vla/isaac-sim-fundamentals',
+                component: ComponentCreator('/module-4-vla/isaac-sim-fundamentals', '2c8'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/llm-planning',
-                component: ComponentCreator('/intro/module-4-vla/llm-planning', '1f7'),
+                path: '/module-4-vla/llm-planning',
+                component: ComponentCreator('/module-4-vla/llm-planning', 'd32'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/multimodal-perception',
-                component: ComponentCreator('/intro/module-4-vla/multimodal-perception', 'a90'),
+                path: '/module-4-vla/multimodal-perception',
+                component: ComponentCreator('/module-4-vla/multimodal-perception', '7db'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/summary',
-                component: ComponentCreator('/intro/module-4-vla/summary', '455'),
+                path: '/module-4-vla/summary',
+                component: ComponentCreator('/module-4-vla/summary', '0d0'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/vla-architecture-diagrams',
-                component: ComponentCreator('/intro/module-4-vla/vla-architecture-diagrams', '77c'),
+                path: '/module-4-vla/vla-architecture-diagrams',
+                component: ComponentCreator('/module-4-vla/vla-architecture-diagrams', 'fda'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/vslam-navigation',
-                component: ComponentCreator('/intro/module-4-vla/vslam-navigation', 'b2b'),
+                path: '/module-4-vla/vslam-navigation',
+                component: ComponentCreator('/module-4-vla/vslam-navigation', '58a'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               },
               {
-                path: '/intro/module-4-vla/whisper-speech',
-                component: ComponentCreator('/intro/module-4-vla/whisper-speech', '014'),
+                path: '/module-4-vla/whisper-speech',
+                component: ComponentCreator('/module-4-vla/whisper-speech', '0db'),
                 exact: true,
                 sidebar: "tutorialSidebar"
               }

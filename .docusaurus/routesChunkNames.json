@@ -1,166 +1,166 @@
 {
-  "/intro-c7c": {
+  "/-b02": {
     "__comp": "5e95c892",
     "__context": {
       "plugin": "aba21aa0"
     }
   },
-  "/intro-235": {
+  "/-05a": {
     "__comp": "a7bd4aaa",
-    "__props": "3db3f026"
+    "__props": "22dd74f7"
   },
-  "/intro-94c": {
+  "/-a99": {
     "__comp": "a94703ab"
   },
-  "/intro/capstone-project/-657": {
+  "/capstone-project/-c4c": {
     "__comp": "17896441",
     "content": "b9a60498"
   },
-  "/intro/capstone-project/autonomous-humanoid-569": {
+  "/capstone-project/autonomous-humanoid-81e": {
     "__comp": "17896441",
     "content": "05a86417"
   },
-  "/intro/intro-096": {
+  "/intro-9fa": {
     "__comp": "17896441",
     "content": "0e384e19"
   },
-  "/intro/module-1-ros2/-d61": {
+  "/module-1-ros2/-a0f": {
     "__comp": "17896441",
     "content": "4dd5b0c3"
   },
-  "/intro/module-1-ros2/installation-setup-45a": {
+  "/module-1-ros2/installation-setup-9b8": {
     "__comp": "17896441",
     "content": "2847a488"
   },
-  "/intro/module-1-ros2/nodes-topics-services-37b": {
+  "/module-1-ros2/nodes-topics-services-332": {
     "__comp": "17896441",
     "content": "d40f44fe"
   },
-  "/intro/module-1-ros2/practical-exercises-e51": {
+  "/module-1-ros2/practical-exercises-b25": {
     "__comp": "17896441",
     "content": "33bade85"
   },
-  "/intro/module-1-ros2/rclpy-basics-ca5": {
+  "/module-1-ros2/rclpy-basics-66f": {
     "__comp": "17896441",
     "content": "537e6e60"
   },
-  "/intro/module-1-ros2/urdf-description-3e1": {
+  "/module-1-ros2/urdf-description-24f": {
     "__comp": "17896441",
     "content": "c71647f0"
   },
-  "/intro/module-2-digital-twin/-a8a": {
+  "/module-2-digital-twin/-ad3": {
     "__comp": "17896441",
     "content": "8113467f"
   },
-  "/intro/module-2-digital-twin/gazebo-simulation-a7a": {
+  "/module-2-digital-twin/gazebo-simulation-9ad": {
     "__comp": "17896441",
     "content": "bd47438f"
   },
-  "/intro/module-2-digital-twin/gazebo-world-setup-d8f": {
+  "/module-2-digital-twin/gazebo-world-setup-904": {
     "__comp": "17896441",
     "content": "b93f3c52"
   },
-  "/intro/module-2-digital-twin/physics-collisions-7f8": {
+  "/module-2-digital-twin/physics-collisions-6ec": {
     "__comp": "17896441",
     "content": "d9d82263"
   },
-  "/intro/module-2-digital-twin/practical-exercises-769": {
+  "/module-2-digital-twin/practical-exercises-5b4": {
     "__comp": "17896441",
     "content": "241082bf"
   },
-  "/intro/module-2-digital-twin/sensor-simulation-bfd": {
+  "/module-2-digital-twin/sensor-simulation-aaa": {
     "__comp": "17896441",
     "content": "3a7a8a21"
   },
-  "/intro/module-2-digital-twin/unity-scene-setup-e96": {
+  "/module-2-digital-twin/unity-scene-setup-480": {
     "__comp": "17896441",
     "content": "7a3ca208"
   },
-  "/intro/module-2-digital-twin/unity-visualization-9da": {
+  "/module-2-digital-twin/unity-visualization-bc9": {
     "__comp": "17896441",
     "content": "4ff84ceb"
   },
-  "/intro/module-2-digital-twin/urdf-validation-944": {
+  "/module-2-digital-twin/urdf-validation-37b": {
     "__comp": "17896441",
     "content": "2fb3208e"
   },
-  "/intro/module-3-ai-perception/-3ad": {
+  "/module-3-ai-perception/-b15": {
     "__comp": "17896441",
     "content": "a79cfcb8"
   },
-  "/intro/module-3-ai-perception/installation-setup-45b": {
+  "/module-3-ai-perception/installation-setup-0d6": {
     "__comp": "17896441",
     "content": "ee133b5c"
   },
-  "/intro/module-3-ai-perception/isaac-sim-a97": {
+  "/module-3-ai-perception/isaac-sim-b8e": {
     "__comp": "17896441",
     "content": "c5a75611"
   },
-  "/intro/module-3-ai-perception/isaac-sim-fundamentals-1d5": {
+  "/module-3-ai-perception/isaac-sim-fundamentals-7fa": {
     "__comp": "17896441",
     "content": "b88e28e2"
   },
-  "/intro/module-3-ai-perception/nav2-locomotion-7f0": {
+  "/module-3-ai-perception/nav2-locomotion-c24": {
     "__comp": "17896441",
     "content": "08165efb"
   },
-  "/intro/module-3-ai-perception/navigation-planning-obstacle-avoidance-847": {
+  "/module-3-ai-perception/navigation-planning-obstacle-avoidance-c6b": {
     "__comp": "17896441",
     "content": "2e9e4261"
   },
-  "/intro/module-3-ai-perception/object-detection-localization-edb": {
+  "/module-3-ai-perception/object-detection-localization-c99": {
     "__comp": "17896441",
     "content": "1cbd726b"
   },
-  "/intro/module-3-ai-perception/perception-navigation-pipeline-diagrams-4d2": {
+  "/module-3-ai-perception/perception-navigation-pipeline-diagrams-15f": {
     "__comp": "17896441",
     "content": "dafaabee"
   },
-  "/intro/module-3-ai-perception/practical-exercises-isaac-ai-6b3": {
+  "/module-3-ai-perception/practical-exercises-isaac-ai-b60": {
     "__comp": "17896441",
     "content": "81d32896"
   },
-  "/intro/module-3-ai-perception/vslam-navigation-6e1": {
+  "/module-3-ai-perception/vslam-navigation-b3e": {
     "__comp": "17896441",
     "content": "090e1b6c"
   },
-  "/intro/module-4-vla/-aed": {
+  "/module-4-vla/-f30": {
     "__comp": "17896441",
     "content": "4a90598f"
   },
-  "/intro/module-4-vla/humanoid-locomotion-control-7c6": {
+  "/module-4-vla/humanoid-locomotion-control-645": {
     "__comp": "17896441",
     "content": "177b11c4"
   },
-  "/intro/module-4-vla/isaac-ros-integration-280": {
+  "/module-4-vla/isaac-ros-integration-c38": {
     "__comp": "17896441",
     "content": "36e4618f"
   },
-  "/intro/module-4-vla/isaac-sim-fundamentals-a67": {
+  "/module-4-vla/isaac-sim-fundamentals-2c8": {
     "__comp": "17896441",
     "content": "b0b5d8e0"
   },
-  "/intro/module-4-vla/llm-planning-1f7": {
+  "/module-4-vla/llm-planning-d32": {
     "__comp": "17896441",
     "content": "ce5d6312"
   },
-  "/intro/module-4-vla/multimodal-perception-a90": {
+  "/module-4-vla/multimodal-perception-7db": {
     "__comp": "17896441",
     "content": "71a36338"
   },
-  "/intro/module-4-vla/summary-455": {
+  "/module-4-vla/summary-0d0": {
     "__comp": "17896441",
     "content": "c0aef4b4"
   },
-  "/intro/module-4-vla/vla-architecture-diagrams-77c": {
+  "/module-4-vla/vla-architecture-diagrams-fda": {
     "__comp": "17896441",
     "content": "a3e0e2a4"
   },
-  "/intro/module-4-vla/vslam-navigation-b2b": {
+  "/module-4-vla/vslam-navigation-58a": {
     "__comp": "17896441",
     "content": "89220a0e"
   },
-  "/intro/module-4-vla/whisper-speech-014": {
+  "/module-4-vla/whisper-speech-0db": {
     "__comp": "17896441",
     "content": "0444bb4a"
   }

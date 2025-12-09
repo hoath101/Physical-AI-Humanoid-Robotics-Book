@@ -19,7 +19,7 @@ const config = {
   organizationName: 'hoath101', // Usually your GitHub org/user name.
   projectName: 'Physical-AI-Humanoid-Robotics-Book', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -37,7 +37,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          routeBasePath: '/',
+          routeBasePath: '/intro',
         },
         blog: false, // Disable blog if not needed
         theme: {

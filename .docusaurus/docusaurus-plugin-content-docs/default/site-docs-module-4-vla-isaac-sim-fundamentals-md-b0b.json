@@ -5,7 +5,7 @@
   "source": "@site/docs/module-4-vla/isaac-sim-fundamentals.md",
   "sourceDirName": "module-4-vla",
   "slug": "/module-4-vla/isaac-sim-fundamentals",
-  "permalink": "/intro/module-4-vla/isaac-sim-fundamentals",
+  "permalink": "/module-4-vla/isaac-sim-fundamentals",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Isaac ROS Integration",
-    "permalink": "/intro/module-4-vla/isaac-ros-integration"
+    "permalink": "/module-4-vla/isaac-ros-integration"
   },
   "next": {
     "title": "LLM Planning for Robotics",
-    "permalink": "/intro/module-4-vla/llm-planning"
+    "permalink": "/module-4-vla/llm-planning"
   }
 }

@@ -1,201 +1,201 @@
 {
   "docusaurus-plugin-content-docs": {
     "default": {
-      "path": "/intro",
+      "path": "/",
       "versions": [
         {
           "name": "current",
           "label": "Next",
           "isLast": true,
-          "path": "/intro",
+          "path": "/",
           "mainDocId": "intro",
           "docs": [
             {
               "id": "capstone-project/autonomous-humanoid",
-              "path": "/intro/capstone-project/autonomous-humanoid"
+              "path": "/capstone-project/autonomous-humanoid"
             },
             {
               "id": "capstone-project/index",
-              "path": "/intro/capstone-project/"
+              "path": "/capstone-project/"
             },
             {
               "id": "intro",
-              "path": "/intro/intro",
+              "path": "/intro",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-1-ros2/installation-setup",
-              "path": "/intro/module-1-ros2/installation-setup",
+              "path": "/module-1-ros2/installation-setup",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-1-ros2/module-1-index",
-              "path": "/intro/module-1-ros2/",
+              "path": "/module-1-ros2/",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-1-ros2/nodes-topics-services",
-              "path": "/intro/module-1-ros2/nodes-topics-services",
+              "path": "/module-1-ros2/nodes-topics-services",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-1-ros2/practical-exercises",
-              "path": "/intro/module-1-ros2/practical-exercises",
+              "path": "/module-1-ros2/practical-exercises",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-1-ros2/rclpy-basics",
-              "path": "/intro/module-1-ros2/rclpy-basics",
+              "path": "/module-1-ros2/rclpy-basics",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-1-ros2/urdf-description",
-              "path": "/intro/module-1-ros2/urdf-description",
+              "path": "/module-1-ros2/urdf-description",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/gazebo-simulation",
-              "path": "/intro/module-2-digital-twin/gazebo-simulation",
+              "path": "/module-2-digital-twin/gazebo-simulation",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/gazebo-world-setup",
-              "path": "/intro/module-2-digital-twin/gazebo-world-setup",
+              "path": "/module-2-digital-twin/gazebo-world-setup",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/module-2-index",
-              "path": "/intro/module-2-digital-twin/",
+              "path": "/module-2-digital-twin/",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/physics-collisions",
-              "path": "/intro/module-2-digital-twin/physics-collisions",
+              "path": "/module-2-digital-twin/physics-collisions",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/practical-exercises",
-              "path": "/intro/module-2-digital-twin/practical-exercises",
+              "path": "/module-2-digital-twin/practical-exercises",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/sensor-simulation",
-              "path": "/intro/module-2-digital-twin/sensor-simulation",
+              "path": "/module-2-digital-twin/sensor-simulation",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/unity-scene-setup",
-              "path": "/intro/module-2-digital-twin/unity-scene-setup",
+              "path": "/module-2-digital-twin/unity-scene-setup",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/unity-visualization",
-              "path": "/intro/module-2-digital-twin/unity-visualization",
+              "path": "/module-2-digital-twin/unity-visualization",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-2-digital-twin/urdf-validation",
-              "path": "/intro/module-2-digital-twin/urdf-validation",
+              "path": "/module-2-digital-twin/urdf-validation",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/installation-setup",
-              "path": "/intro/module-3-ai-perception/installation-setup",
+              "path": "/module-3-ai-perception/installation-setup",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/isaac-sim",
-              "path": "/intro/module-3-ai-perception/isaac-sim",
+              "path": "/module-3-ai-perception/isaac-sim",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/isaac-sim-fundamentals",
-              "path": "/intro/module-3-ai-perception/isaac-sim-fundamentals",
+              "path": "/module-3-ai-perception/isaac-sim-fundamentals",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/module-3-index",
-              "path": "/intro/module-3-ai-perception/",
+              "path": "/module-3-ai-perception/",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/nav2-locomotion",
-              "path": "/intro/module-3-ai-perception/nav2-locomotion",
+              "path": "/module-3-ai-perception/nav2-locomotion",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/navigation-planning-obstacle-avoidance",
-              "path": "/intro/module-3-ai-perception/navigation-planning-obstacle-avoidance",
+              "path": "/module-3-ai-perception/navigation-planning-obstacle-avoidance",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/object-detection-localization",
-              "path": "/intro/module-3-ai-perception/object-detection-localization",
+              "path": "/module-3-ai-perception/object-detection-localization",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/perception-navigation-pipeline-diagrams",
-              "path": "/intro/module-3-ai-perception/perception-navigation-pipeline-diagrams",
+              "path": "/module-3-ai-perception/perception-navigation-pipeline-diagrams",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/practical-exercises-isaac-ai",
-              "path": "/intro/module-3-ai-perception/practical-exercises-isaac-ai",
+              "path": "/module-3-ai-perception/practical-exercises-isaac-ai",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-3-ai-perception/vslam-navigation",
-              "path": "/intro/module-3-ai-perception/vslam-navigation",
+              "path": "/module-3-ai-perception/vslam-navigation",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/humanoid-locomotion-control",
-              "path": "/intro/module-4-vla/humanoid-locomotion-control",
+              "path": "/module-4-vla/humanoid-locomotion-control",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/isaac-ros-integration",
-              "path": "/intro/module-4-vla/isaac-ros-integration",
+              "path": "/module-4-vla/isaac-ros-integration",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/isaac-sim-fundamentals",
-              "path": "/intro/module-4-vla/isaac-sim-fundamentals",
+              "path": "/module-4-vla/isaac-sim-fundamentals",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/llm-planning",
-              "path": "/intro/module-4-vla/llm-planning",
+              "path": "/module-4-vla/llm-planning",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/module-4-index",
-              "path": "/intro/module-4-vla/",
+              "path": "/module-4-vla/",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/multimodal-perception",
-              "path": "/intro/module-4-vla/multimodal-perception",
+              "path": "/module-4-vla/multimodal-perception",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/summary",
-              "path": "/intro/module-4-vla/summary",
+              "path": "/module-4-vla/summary",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/vla-architecture-diagrams",
-              "path": "/intro/module-4-vla/vla-architecture-diagrams",
+              "path": "/module-4-vla/vla-architecture-diagrams",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/vslam-navigation",
-              "path": "/intro/module-4-vla/vslam-navigation",
+              "path": "/module-4-vla/vslam-navigation",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "module-4-vla/whisper-speech",
-              "path": "/intro/module-4-vla/whisper-speech",
+              "path": "/module-4-vla/whisper-speech",
               "sidebar": "tutorialSidebar"
             }
           ],
@@ -203,7 +203,7 @@
           "sidebars": {
             "tutorialSidebar": {
               "link": {
-                "path": "/intro/intro",
+                "path": "/intro",
                 "label": "intro"
               }
             }
