@@ -79,7 +79,7 @@ const config = {
             items: [
               {
                 label: 'Introduction',
-                to: '/',
+                to: '/Physical-AI-Humanoid-Robotics-Book/',
               },
             ],
           },
