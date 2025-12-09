@@ -1,0 +1,28 @@
+{
+  "id": "module-3-ai-perception/module-3-index",
+  "title": "Module 3 AI Perception",
+  "description": "Welcome to Module 3 of the Physical AI & Humanoid Robotics book! This module focuses on the AI components that power modern robotics: perception, navigation, and intelligent decision-making using NVIDIA Isaac technologies.",
+  "source": "@site/docs/module-3-ai-perception/index.md",
+  "sourceDirName": "module-3-ai-perception",
+  "slug": "/module-3-ai-perception/",
+  "permalink": "/module-3-ai-perception/",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "id": "module-3-index",
+    "title": "Module 3 AI Perception",
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "URDF Model Creation and Validation",
+    "permalink": "/module-2-digital-twin/urdf-validation"
+  },
+  "next": {
+    "title": "Isaac Sim Installation and Setup",
+    "permalink": "/module-3-ai-perception/installation-setup"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "module-2-digital-twin/gazebo-world-setup",
+  "title": "Gazebo World Setup and Configuration",
+  "description": "Setting up realistic and functional simulation environments is crucial for effective digital twin development. This section covers creating and configuring Gazebo worlds for humanoid robotics applications.",
+  "source": "@site/docs/module-2-digital-twin/gazebo-world-setup.md",
+  "sourceDirName": "module-2-digital-twin",
+  "slug": "/module-2-digital-twin/gazebo-world-setup",
+  "permalink": "/module-2-digital-twin/gazebo-world-setup",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Gazebo Simulation",
+    "permalink": "/module-2-digital-twin/gazebo-simulation"
+  },
+  "next": {
+    "title": "Physics and Collisions",
+    "permalink": "/module-2-digital-twin/physics-collisions"
+  }
+}

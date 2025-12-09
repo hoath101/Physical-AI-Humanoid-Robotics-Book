@@ -1,0 +1,23 @@
+{
+  "id": "module-4-vla/isaac-ros-integration",
+  "title": "Isaac ROS Integration",
+  "description": "Isaac ROS is NVIDIA's collection of hardware-accelerated perception and navigation packages that bridge the gap between NVIDIA's GPU-accelerated AI capabilities and the ROS 2 robotics framework. This section covers how to integrate Isaac ROS packages with humanoid robotics systems.",
+  "source": "@site/docs/module-4-vla/isaac-ros-integration.md",
+  "sourceDirName": "module-4-vla",
+  "slug": "/module-4-vla/isaac-ros-integration",
+  "permalink": "/module-4-vla/isaac-ros-integration",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Humanoid Locomotion and Control",
+    "permalink": "/module-4-vla/humanoid-locomotion-control"
+  },
+  "next": {
+    "title": "Isaac Sim Fundamentals",
+    "permalink": "/module-4-vla/isaac-sim-fundamentals"
+  }
+}

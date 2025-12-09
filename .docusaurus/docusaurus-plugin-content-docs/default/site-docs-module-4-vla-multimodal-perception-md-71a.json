@@ -1,0 +1,23 @@
+{
+  "id": "module-4-vla/multimodal-perception",
+  "title": "Multimodal Perception",
+  "description": "Multimodal perception refers to the integration of multiple sensory modalities (vision, language, and action) to create a comprehensive understanding of the environment and enable intelligent robot behavior. This section covers the integration of visual, linguistic, and motor information for humanoid robotics.",
+  "source": "@site/docs/module-4-vla/multimodal-perception.md",
+  "sourceDirName": "module-4-vla",
+  "slug": "/module-4-vla/multimodal-perception",
+  "permalink": "/module-4-vla/multimodal-perception",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "LLM Planning for Robotics",
+    "permalink": "/module-4-vla/llm-planning"
+  },
+  "next": {
+    "title": "VLA Architecture Diagrams",
+    "permalink": "/module-4-vla/vla-architecture-diagrams"
+  }
+}

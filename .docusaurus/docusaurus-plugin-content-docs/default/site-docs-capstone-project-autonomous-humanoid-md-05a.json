@@ -1,0 +1,17 @@
+{
+  "id": "capstone-project/autonomous-humanoid",
+  "title": "Autonomous Humanoid Project",
+  "description": "",
+  "source": "@site/docs/capstone-project/autonomous-humanoid.md",
+  "sourceDirName": "capstone-project",
+  "slug": "/capstone-project/autonomous-humanoid",
+  "permalink": "/capstone-project/autonomous-humanoid",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "autonomous-humanoid",
+    "title": "Autonomous Humanoid Project"
+  }
+}

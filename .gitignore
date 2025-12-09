@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+dist/
+*.egg-info/
+
+# C++
+build/
+bin/
+obj/
+out/
+*.o
+*.so
+*.a
+*.exe
+*.dll
+
+# LaTeX
+*.aux
+*.log
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.dvi
+*.lof
+*.lot
+*.gz
+
+# Unity
+Library/
+Temp/
+Obj/
+Logs/
+Assets/AssetStoreTools/
+UserSettings/
+*.unityproj
+*.pidb
+*.suo
+*.user
+*.userprefs
+*.csproj
+*.pidb
+# *.meta - Be careful with this, as .meta files are important for Unity assets.
+# Only ignore if specifically known to be generated/temporary.
+# For now, excluding to prevent accidental asset loss.
+build/
+
+# General
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+*.log
+.env*
+node_modules/
+dist/
+build/

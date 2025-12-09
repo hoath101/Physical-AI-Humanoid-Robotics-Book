@@ -1,0 +1,23 @@
+{
+  "id": "module-4-vla/vslam-navigation",
+  "title": "VSLAM and Navigation",
+  "description": "Visual Simultaneous Localization and Mapping (VSLAM) is a critical technology for autonomous robots, enabling them to understand their environment and navigate without prior knowledge. This section covers VSLAM concepts and navigation techniques for humanoid robots using Isaac Sim and Isaac ROS.",
+  "source": "@site/docs/module-4-vla/vslam-navigation.md",
+  "sourceDirName": "module-4-vla",
+  "slug": "/module-4-vla/vslam-navigation",
+  "permalink": "/module-4-vla/vslam-navigation",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "VLA Architecture Diagrams",
+    "permalink": "/module-4-vla/vla-architecture-diagrams"
+  },
+  "next": {
+    "title": "Whisper Speech Processing",
+    "permalink": "/module-4-vla/whisper-speech"
+  }
+}

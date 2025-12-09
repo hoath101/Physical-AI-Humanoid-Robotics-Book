@@ -1,0 +1,23 @@
+{
+  "id": "module-2-digital-twin/unity-visualization",
+  "title": "Unity Visualization",
+  "description": "Unity provides a powerful game engine environment for high-fidelity robot simulation and visualization. While Gazebo is the standard for ROS simulation, Unity offers advanced graphics capabilities and a rich ecosystem for creating detailed digital twins.",
+  "source": "@site/docs/module-2-digital-twin/unity-visualization.md",
+  "sourceDirName": "module-2-digital-twin",
+  "slug": "/module-2-digital-twin/unity-visualization",
+  "permalink": "/module-2-digital-twin/unity-visualization",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Unity Scene Setup and Physics Configuration",
+    "permalink": "/module-2-digital-twin/unity-scene-setup"
+  },
+  "next": {
+    "title": "URDF Model Creation and Validation",
+    "permalink": "/module-2-digital-twin/urdf-validation"
+  }
+}

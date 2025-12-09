@@ -1,0 +1,23 @@
+{
+  "id": "module-4-vla/isaac-sim-fundamentals",
+  "title": "Isaac Sim Fundamentals",
+  "description": "Isaac Sim is NVIDIA's high-fidelity simulation environment built on the Omniverse platform, designed specifically for developing, testing, and validating AI-based robotics applications. This section covers the core concepts and fundamentals of Isaac Sim.",
+  "source": "@site/docs/module-4-vla/isaac-sim-fundamentals.md",
+  "sourceDirName": "module-4-vla",
+  "slug": "/module-4-vla/isaac-sim-fundamentals",
+  "permalink": "/module-4-vla/isaac-sim-fundamentals",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Isaac ROS Integration",
+    "permalink": "/module-4-vla/isaac-ros-integration"
+  },
+  "next": {
+    "title": "LLM Planning for Robotics",
+    "permalink": "/module-4-vla/llm-planning"
+  }
+}

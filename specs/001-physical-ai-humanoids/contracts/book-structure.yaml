@@ -1,0 +1,98 @@
+# Book Structure Contract
+# Defines the expected structure and content requirements for the Physical AI & Humanoid Robotics book
+
+title: "Physical AI & Humanoid Robotics"
+version: "1.0.0"
+description: "Educational book on Physical AI with ROS 2, Gazebo, Unity, and NVIDIA Isaac"
+
+modules:
+  - id: "module-1-ros2"
+    title: "The Robotic Nervous System (ROS 2)"
+    description: "ROS 2 nodes, topics, services, rclpy for Python-ROS bridging, URDF for humanoid description"
+    required_sections:
+      - "Introduction to ROS 2 concepts"
+      - "Nodes, topics, and services"
+      - "rclpy basics"
+      - "URDF for humanoid robots"
+      - "Practical exercises"
+    word_count_range: [3000, 5000]
+    learning_outcomes:
+      - "Students can build and run ROS 2 nodes, topics, services, and actions"
+      - "Students understand the ROS 2 communication patterns"
+      - "Students can create basic ROS 2 nodes in Python"
+
+  - id: "module-2-digital-twin"
+    title: "The Digital Twin (Gazebo & Unity)"
+    description: "Physics simulation, gravity, collisions, sensor simulation, Unity-based visualization"
+    required_sections:
+      - "Introduction to digital twins"
+      - "Gazebo simulation fundamentals"
+      - "Unity visualization"
+      - "Physics and collision modeling"
+      - "Sensor simulation"
+      - "Practical exercises"
+    word_count_range: [4000, 6000]
+    learning_outcomes:
+      - "Students can create a Digital Twin using Gazebo/Unity"
+      - "Students understand simulation physics"
+      - "Students can simulate sensors in virtual environments"
+
+  - id: "module-3-ai-perception"
+    title: "The AI-Robot Brain (NVIDIA Isaac)"
+    description: "Isaac Sim for photorealistic simulation, Isaac ROS for VSLAM + navigation, Nav2 for humanoid locomotion"
+    required_sections:
+      - "Introduction to NVIDIA Isaac"
+      - "Isaac Sim fundamentals"
+      - "VSLAM and navigation"
+      - "Nav2 for humanoid locomotion"
+      - "Practical exercises"
+    word_count_range: [4000, 6000]
+    learning_outcomes:
+      - "Students can run Isaac Sim and generate synthetic data"
+      - "Students can perform VSLAM"
+      - "Students understand Nav2 for humanoid navigation"
+
+  - id: "module-4-vla"
+    title: "Vision-Language-Action"
+    description: "Whisper for speech commands, LLM-driven planning, multimodal perception"
+    required_sections:
+      - "Introduction to VLA concepts"
+      - "Whisper for speech processing"
+      - "LLM-driven planning"
+      - "Multimodal perception"
+      - "Integration with ROS 2"
+      - "Practical exercises"
+    word_count_range: [4000, 6000]
+    learning_outcomes:
+      - "Students can implement Vision-Language-Action pipelines"
+      - "Students understand voice-to-action pipelines"
+      - "Students can integrate LLMs with robotic systems"
+
+capstone:
+  id: "capstone-project"
+  title: "Autonomous Capstone Task"
+  description: "Simulated humanoid robot performing voice command interpretation, navigation, object detection, and manipulation"
+  required_sections:
+    - "Capstone project overview"
+    - "Integration of all modules"
+    - "Voice-to-action pipeline implementation"
+    - "Navigation and manipulation tasks"
+    - "Final assessment"
+  word_count_range: [3000, 5000]
+  learning_outcomes:
+    - "Students successfully complete a Capstone Project: a simulated autonomous humanoid capable of voice-to-action, path planning, navigation, object detection, and manipulation"
+    - "Students demonstrate integrated physical AI capabilities"
+
+content_standards:
+  writing_level: "Flesch-Kincaid Grade 10-12"
+  citation_style: "APA 7th edition"
+  technical_accuracy: "All concepts must be factually correct and referenced"
+  reproducibility: "All examples must be executable and verifiable"
+  diagrams: "Required for all complex concepts and system architectures"
+  code_samples: "Must follow ROS 2 best practices and be executable"
+
+deployment:
+  platform: "Docusaurus"
+  hosting: "GitHub Pages"
+  format: "Markdown with Docusaurus extensions"
+  accessibility: "WCAG 2.1 AA compliance"

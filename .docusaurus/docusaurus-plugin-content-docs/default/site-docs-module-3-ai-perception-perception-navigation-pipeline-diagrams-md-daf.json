@@ -1,0 +1,23 @@
+{
+  "id": "module-3-ai-perception/perception-navigation-pipeline-diagrams",
+  "title": "Perception and Navigation Pipeline Diagrams",
+  "description": "This section describes the diagrams that illustrate the perception and navigation pipeline for humanoid robots using NVIDIA Isaac technologies. These diagrams help visualize the data flow and system architecture.",
+  "source": "@site/docs/module-3-ai-perception/perception-navigation-pipeline-diagrams.md",
+  "sourceDirName": "module-3-ai-perception",
+  "slug": "/module-3-ai-perception/perception-navigation-pipeline-diagrams",
+  "permalink": "/module-3-ai-perception/perception-navigation-pipeline-diagrams",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Nav2 for Humanoid Locomotion",
+    "permalink": "/module-3-ai-perception/nav2-locomotion"
+  },
+  "next": {
+    "title": "Practical Exercises with Isaac AI Components",
+    "permalink": "/module-3-ai-perception/practical-exercises-isaac-ai"
+  }
+}

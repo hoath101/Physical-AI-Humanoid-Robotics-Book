@@ -1,0 +1,23 @@
+{
+  "id": "module-2-digital-twin/unity-scene-setup",
+  "title": "Unity Scene Setup and Physics Configuration",
+  "description": "Unity provides a powerful environment for creating high-fidelity digital twins with advanced graphics and physics capabilities. This section covers setting up Unity scenes for humanoid robotics simulation with proper physics configuration.",
+  "source": "@site/docs/module-2-digital-twin/unity-scene-setup.md",
+  "sourceDirName": "module-2-digital-twin",
+  "slug": "/module-2-digital-twin/unity-scene-setup",
+  "permalink": "/module-2-digital-twin/unity-scene-setup",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Sensor Simulation",
+    "permalink": "/module-2-digital-twin/sensor-simulation"
+  },
+  "next": {
+    "title": "Unity Visualization",
+    "permalink": "/module-2-digital-twin/unity-visualization"
+  }
+}
