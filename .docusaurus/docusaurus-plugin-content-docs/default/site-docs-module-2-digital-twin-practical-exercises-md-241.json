@@ -5,7 +5,7 @@
   "source": "@site/docs/module-2-digital-twin/practical-exercises.md",
   "sourceDirName": "module-2-digital-twin",
   "slug": "/module-2-digital-twin/practical-exercises",
-  "permalink": "/docs/module-2-digital-twin/practical-exercises",
+  "permalink": "/module-2-digital-twin/practical-exercises",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Physics and Collisions",
-    "permalink": "/docs/module-2-digital-twin/physics-collisions"
+    "permalink": "/module-2-digital-twin/physics-collisions"
   },
   "next": {
     "title": "Sensor Simulation",
-    "permalink": "/docs/module-2-digital-twin/sensor-simulation"
+    "permalink": "/module-2-digital-twin/sensor-simulation"
   }
 }

@@ -4,8 +4,8 @@
   "description": "<!-- ---",
   "source": "@site/docs/intro.md",
   "sourceDirName": ".",
-  "slug": "/intro",
-  "permalink": "/docs/intro",
+  "slug": "/",
+  "permalink": "/",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,11 +14,12 @@
   "frontMatter": {
     "id": "intro",
     "title": "Introduction",
-    "sidebar_position": 1
+    "sidebar_position": 1,
+    "slug": "/"
   },
   "sidebar": "tutorialSidebar",
   "next": {
     "title": "Module 1 ROS-2",
-    "permalink": "/docs/module-1-ros2/"
+    "permalink": "/module-1-ros2/"
   }
 }

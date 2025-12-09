@@ -5,7 +5,7 @@
   "source": "@site/docs/module-1-ros2/nodes-topics-services.md",
   "sourceDirName": "module-1-ros2",
   "slug": "/module-1-ros2/nodes-topics-services",
-  "permalink": "/docs/module-1-ros2/nodes-topics-services",
+  "permalink": "/module-1-ros2/nodes-topics-services",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "ROS 2 Installation and Setup",
-    "permalink": "/docs/module-1-ros2/installation-setup"
+    "permalink": "/module-1-ros2/installation-setup"
   },
   "next": {
     "title": "Practical Exercises - ROS 2 Fundamentals",
-    "permalink": "/docs/module-1-ros2/practical-exercises"
+    "permalink": "/module-1-ros2/practical-exercises"
   }
 }

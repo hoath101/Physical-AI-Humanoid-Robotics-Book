@@ -5,7 +5,7 @@
   "source": "@site/docs/module-4-vla/vla-architecture-diagrams.md",
   "sourceDirName": "module-4-vla",
   "slug": "/module-4-vla/vla-architecture-diagrams",
-  "permalink": "/docs/module-4-vla/vla-architecture-diagrams",
+  "permalink": "/module-4-vla/vla-architecture-diagrams",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Multimodal Perception",
-    "permalink": "/docs/module-4-vla/multimodal-perception"
+    "permalink": "/module-4-vla/multimodal-perception"
   },
   "next": {
     "title": "VSLAM and Navigation",
-    "permalink": "/docs/module-4-vla/vslam-navigation"
+    "permalink": "/module-4-vla/vslam-navigation"
   }
 }

@@ -37,6 +37,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          routeBasePath: '/', // serve docs at /
         },
         blog: false, // Disable blog if not needed
         theme: {
@@ -79,7 +80,7 @@ const config = {
             items: [
               {
                 label: 'Introduction',
-                to: '/intro',
+                to: '/',
               },
             ],
           },

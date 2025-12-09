@@ -5,7 +5,7 @@
   "source": "@site/docs/module-1-ros2/rclpy-basics.md",
   "sourceDirName": "module-1-ros2",
   "slug": "/module-1-ros2/rclpy-basics",
-  "permalink": "/docs/module-1-ros2/rclpy-basics",
+  "permalink": "/module-1-ros2/rclpy-basics",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Practical Exercises - ROS 2 Fundamentals",
-    "permalink": "/docs/module-1-ros2/practical-exercises"
+    "permalink": "/module-1-ros2/practical-exercises"
   },
   "next": {
     "title": "URDF Description",
-    "permalink": "/docs/module-1-ros2/urdf-description"
+    "permalink": "/module-1-ros2/urdf-description"
   }
 }
