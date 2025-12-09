@@ -50,7 +50,6 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
       navbar: {
         title: 'Physical AI & Humanoid Robotics',
         logo: {
@@ -77,9 +76,10 @@ const config = {
           {
             title: 'Content',
             items: [
+
               {
                 label: 'Introduction',
-                to: '/',
+                to: '/docs/intro',
               },
             ],
           },
@@ -101,12 +101,12 @@ const config = {
             items: [
               {
                 label: 'GitHub',
-                href: 'https://github.com/your-username/physical-ai-humanoid-robotics',
+                href: 'https://github.com/hoath101/physical-ai-humanoid-robotics',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Physical AI & Humanoid Robotics Book. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()}  Physical AI & Humanoid Robotics Book. Built with Docusaurus.`,
       },
       prism: {
         theme: require('prism-react-renderer').themes.github,
