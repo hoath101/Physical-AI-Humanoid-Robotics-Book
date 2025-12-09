@@ -9,15 +9,15 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'http://localhost:3000',
+  url: 'https://hoath101.github.io',
   // Set the /<base>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'your-organization', // Usually your GitHub org/user name.
-  projectName: 'physical-ai-humanoid-robotics', // Usually your repo name.
+  organizationName: 'hoath101', // Usually your GitHub org/user name.
+  projectName: 'Physical-AI-Humanoid-Robotics-Book', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -37,7 +37,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          routeBasePath: '/',
+          routeBasePath: '/intro',
         },
         blog: false, // Disable blog if not needed
         theme: {
@@ -66,7 +66,7 @@ const config = {
             label: 'Book',
           },
           {
-            href: 'https://github.com/your-username/physical-ai-humanoid-robotics',
+            href: 'https://github.com/hoath101/physical-ai-humanoid-robotics-book',
             label: 'GitHub',
             position: 'right',
           },

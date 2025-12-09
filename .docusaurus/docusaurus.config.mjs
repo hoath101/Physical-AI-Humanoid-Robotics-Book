@@ -7,10 +7,10 @@ export default {
   "title": "Physical AI & Humanoid Robotics",
   "tagline": "Bridging Digital Intelligence and Physical Robotic Bodies",
   "favicon": "img/favicon.ico",
-  "url": "http://localhost:3000",
+  "url": "https://hoath101.github.io",
   "baseUrl": "/",
-  "organizationName": "your-organization",
-  "projectName": "physical-ai-humanoid-robotics",
+  "organizationName": "hoath101",
+  "projectName": "Physical-AI-Humanoid-Robotics-Book",
   "onBrokenLinks": "throw",
   "i18n": {
     "defaultLocale": "en",
@@ -26,7 +26,7 @@ export default {
       {
         "docs": {
           "sidebarPath": "C:\\Users\\Baloch\\GIAIC-WORK\\hackathon-book\\sidebars.js",
-          "routeBasePath": "/"
+          "routeBasePath": "/intro"
         },
         "blog": false,
         "theme": {
@@ -51,7 +51,7 @@ export default {
           "label": "Book"
         },
         {
-          "href": "https://github.com/your-username/physical-ai-humanoid-robotics",
+          "href": "https://github.com/hoath101/physical-ai-humanoid-robotics-book",
           "label": "GitHub",
           "position": "right"
         }
