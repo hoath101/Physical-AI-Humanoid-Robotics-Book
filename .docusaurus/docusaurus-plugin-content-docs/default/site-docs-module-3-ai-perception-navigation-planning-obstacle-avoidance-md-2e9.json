@@ -5,7 +5,7 @@
   "source": "@site/docs/module-3-ai-perception/navigation-planning-obstacle-avoidance.md",
   "sourceDirName": "module-3-ai-perception",
   "slug": "/module-3-ai-perception/navigation-planning-obstacle-avoidance",
-  "permalink": "/module-3-ai-perception/navigation-planning-obstacle-avoidance",
+  "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-3-ai-perception/navigation-planning-obstacle-avoidance",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Object Detection and Localization Examples",
-    "permalink": "/module-3-ai-perception/object-detection-localization"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-3-ai-perception/object-detection-localization"
   },
   "next": {
     "title": "Nav2 for Humanoid Locomotion",
-    "permalink": "/module-3-ai-perception/nav2-locomotion"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-3-ai-perception/nav2-locomotion"
   }
 }

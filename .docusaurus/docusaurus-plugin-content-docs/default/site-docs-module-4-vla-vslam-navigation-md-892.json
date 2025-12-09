@@ -5,7 +5,7 @@
   "source": "@site/docs/module-4-vla/vslam-navigation.md",
   "sourceDirName": "module-4-vla",
   "slug": "/module-4-vla/vslam-navigation",
-  "permalink": "/module-4-vla/vslam-navigation",
+  "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/vslam-navigation",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "VLA Architecture Diagrams",
-    "permalink": "/module-4-vla/vla-architecture-diagrams"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/vla-architecture-diagrams"
   },
   "next": {
     "title": "Whisper Speech Processing",
-    "permalink": "/module-4-vla/whisper-speech"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/whisper-speech"
   }
 }

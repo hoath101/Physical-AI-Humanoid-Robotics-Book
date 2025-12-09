@@ -5,7 +5,7 @@
   "source": "@site/docs/module-4-vla/multimodal-perception.md",
   "sourceDirName": "module-4-vla",
   "slug": "/module-4-vla/multimodal-perception",
-  "permalink": "/module-4-vla/multimodal-perception",
+  "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/multimodal-perception",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "LLM Planning for Robotics",
-    "permalink": "/module-4-vla/llm-planning"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/llm-planning"
   },
   "next": {
     "title": "VLA Architecture Diagrams",
-    "permalink": "/module-4-vla/vla-architecture-diagrams"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/vla-architecture-diagrams"
   }
 }

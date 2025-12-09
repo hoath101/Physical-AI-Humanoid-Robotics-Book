@@ -8,7 +8,7 @@ export default {
   "tagline": "Bridging Digital Intelligence and Physical Robotic Bodies",
   "favicon": "img/favicon.ico",
   "url": "https://hoath101.github.io",
-  "baseUrl": "/",
+  "baseUrl": "/Physical-AI-Humanoid-Robotics-Book/",
   "organizationName": "hoath101",
   "projectName": "Physical-AI-Humanoid-Robotics-Book",
   "onBrokenLinks": "warn",
@@ -26,7 +26,7 @@ export default {
       {
         "docs": {
           "sidebarPath": "C:\\Users\\Baloch\\GIAIC-WORK\\hackathon-book\\sidebars.js",
-          "routeBasePath": "/"
+          "routeBasePath": ""
         },
         "blog": false,
         "theme": {

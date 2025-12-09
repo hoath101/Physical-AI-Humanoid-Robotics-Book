@@ -5,7 +5,7 @@
   "source": "@site/docs/module-4-vla/summary.md",
   "sourceDirName": "module-4-vla",
   "slug": "/module-4-vla/summary",
-  "permalink": "/module-4-vla/summary",
+  "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/summary",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Module 4 VLA",
-    "permalink": "/module-4-vla/"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/"
   },
   "next": {
     "title": "Humanoid Locomotion and Control",
-    "permalink": "/module-4-vla/humanoid-locomotion-control"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/humanoid-locomotion-control"
   }
 }

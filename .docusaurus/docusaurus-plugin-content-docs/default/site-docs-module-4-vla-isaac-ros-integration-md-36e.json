@@ -5,7 +5,7 @@
   "source": "@site/docs/module-4-vla/isaac-ros-integration.md",
   "sourceDirName": "module-4-vla",
   "slug": "/module-4-vla/isaac-ros-integration",
-  "permalink": "/module-4-vla/isaac-ros-integration",
+  "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/isaac-ros-integration",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Humanoid Locomotion and Control",
-    "permalink": "/module-4-vla/humanoid-locomotion-control"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/humanoid-locomotion-control"
   },
   "next": {
     "title": "Isaac Sim Fundamentals",
-    "permalink": "/module-4-vla/isaac-sim-fundamentals"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-4-vla/isaac-sim-fundamentals"
   }
 }
