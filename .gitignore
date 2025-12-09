@@ -5,6 +5,9 @@ __pycache__/
 venv/
 dist/
 *.egg-info/
+build/
+.docusaurus/
+docusaurus/
 
 # C++
 bin/
@@ -29,6 +32,7 @@ out/
 *.lof
 *.lot
 *.gz
+build/ 
 
 # Unity
 Library/
