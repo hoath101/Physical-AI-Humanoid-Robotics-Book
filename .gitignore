@@ -7,7 +7,6 @@ dist/
 *.egg-info/
 
 # C++
-build/
 bin/
 obj/
 out/
@@ -60,5 +59,4 @@ Thumbs.db
 .env*
 node_modules/
 dist/
-build/
 .docusaurus/
