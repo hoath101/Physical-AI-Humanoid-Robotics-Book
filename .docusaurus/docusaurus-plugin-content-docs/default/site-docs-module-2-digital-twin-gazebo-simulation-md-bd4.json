@@ -5,7 +5,7 @@
   "source": "@site/docs/module-2-digital-twin/gazebo-simulation.md",
   "sourceDirName": "module-2-digital-twin",
   "slug": "/module-2-digital-twin/gazebo-simulation",
-  "permalink": "/intro/module-2-digital-twin/gazebo-simulation",
+  "permalink": "/docs/module-2-digital-twin/gazebo-simulation",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Module 2 Digital Twin",
-    "permalink": "/intro/module-2-digital-twin/"
+    "permalink": "/docs/module-2-digital-twin/"
   },
   "next": {
     "title": "Gazebo World Setup and Configuration",
-    "permalink": "/intro/module-2-digital-twin/gazebo-world-setup"
+    "permalink": "/docs/module-2-digital-twin/gazebo-world-setup"
   }
 }

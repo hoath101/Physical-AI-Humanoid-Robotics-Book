@@ -5,7 +5,7 @@
   "source": "@site/docs/module-3-ai-perception/nav2-locomotion.md",
   "sourceDirName": "module-3-ai-perception",
   "slug": "/module-3-ai-perception/nav2-locomotion",
-  "permalink": "/intro/module-3-ai-perception/nav2-locomotion",
+  "permalink": "/docs/module-3-ai-perception/nav2-locomotion",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Navigation Planning and Obstacle Avoidance Examples",
-    "permalink": "/intro/module-3-ai-perception/navigation-planning-obstacle-avoidance"
+    "permalink": "/docs/module-3-ai-perception/navigation-planning-obstacle-avoidance"
   },
   "next": {
     "title": "Perception and Navigation Pipeline Diagrams",
-    "permalink": "/intro/module-3-ai-perception/perception-navigation-pipeline-diagrams"
+    "permalink": "/docs/module-3-ai-perception/perception-navigation-pipeline-diagrams"
   }
 }

@@ -1,4 +1,5 @@
 export default {
+  "0058b4c6": [() => import(/* webpackChunkName: "0058b4c6" */ "@generated/docusaurus-plugin-content-docs/default/p/docs-175.json"), "@generated/docusaurus-plugin-content-docs/default/p/docs-175.json", require.resolveWeak("@generated/docusaurus-plugin-content-docs/default/p/docs-175.json")],
   "0444bb4a": [() => import(/* webpackChunkName: "0444bb4a" */ "@site/docs/module-4-vla/whisper-speech.md"), "@site/docs/module-4-vla/whisper-speech.md", require.resolveWeak("@site/docs/module-4-vla/whisper-speech.md")],
   "05a86417": [() => import(/* webpackChunkName: "05a86417" */ "@site/docs/capstone-project/autonomous-humanoid.md"), "@site/docs/capstone-project/autonomous-humanoid.md", require.resolveWeak("@site/docs/capstone-project/autonomous-humanoid.md")],
   "08165efb": [() => import(/* webpackChunkName: "08165efb" */ "@site/docs/module-3-ai-perception/nav2-locomotion.md"), "@site/docs/module-3-ai-perception/nav2-locomotion.md", require.resolveWeak("@site/docs/module-3-ai-perception/nav2-locomotion.md")],
@@ -14,7 +15,6 @@ export default {
   "33bade85": [() => import(/* webpackChunkName: "33bade85" */ "@site/docs/module-1-ros2/practical-exercises.md"), "@site/docs/module-1-ros2/practical-exercises.md", require.resolveWeak("@site/docs/module-1-ros2/practical-exercises.md")],
   "36e4618f": [() => import(/* webpackChunkName: "36e4618f" */ "@site/docs/module-4-vla/isaac-ros-integration.md"), "@site/docs/module-4-vla/isaac-ros-integration.md", require.resolveWeak("@site/docs/module-4-vla/isaac-ros-integration.md")],
   "3a7a8a21": [() => import(/* webpackChunkName: "3a7a8a21" */ "@site/docs/module-2-digital-twin/sensor-simulation.md"), "@site/docs/module-2-digital-twin/sensor-simulation.md", require.resolveWeak("@site/docs/module-2-digital-twin/sensor-simulation.md")],
-  "3db3f026": [() => import(/* webpackChunkName: "3db3f026" */ "@generated/docusaurus-plugin-content-docs/default/p/intro-a7e.json"), "@generated/docusaurus-plugin-content-docs/default/p/intro-a7e.json", require.resolveWeak("@generated/docusaurus-plugin-content-docs/default/p/intro-a7e.json")],
   "4a90598f": [() => import(/* webpackChunkName: "4a90598f" */ "@site/docs/module-4-vla/index.md"), "@site/docs/module-4-vla/index.md", require.resolveWeak("@site/docs/module-4-vla/index.md")],
   "4dd5b0c3": [() => import(/* webpackChunkName: "4dd5b0c3" */ "@site/docs/module-1-ros2/index.md"), "@site/docs/module-1-ros2/index.md", require.resolveWeak("@site/docs/module-1-ros2/index.md")],
   "4ff84ceb": [() => import(/* webpackChunkName: "4ff84ceb" */ "@site/docs/module-2-digital-twin/unity-visualization.md"), "@site/docs/module-2-digital-twin/unity-visualization.md", require.resolveWeak("@site/docs/module-2-digital-twin/unity-visualization.md")],

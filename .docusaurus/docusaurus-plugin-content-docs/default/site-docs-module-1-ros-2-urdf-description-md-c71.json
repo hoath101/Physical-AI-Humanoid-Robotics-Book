@@ -5,7 +5,7 @@
   "source": "@site/docs/module-1-ros2/urdf-description.md",
   "sourceDirName": "module-1-ros2",
   "slug": "/module-1-ros2/urdf-description",
-  "permalink": "/intro/module-1-ros2/urdf-description",
+  "permalink": "/docs/module-1-ros2/urdf-description",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "rclpy Basics",
-    "permalink": "/intro/module-1-ros2/rclpy-basics"
+    "permalink": "/docs/module-1-ros2/rclpy-basics"
   },
   "next": {
     "title": "Module 2 Digital Twin",
-    "permalink": "/intro/module-2-digital-twin/"
+    "permalink": "/docs/module-2-digital-twin/"
   }
 }
