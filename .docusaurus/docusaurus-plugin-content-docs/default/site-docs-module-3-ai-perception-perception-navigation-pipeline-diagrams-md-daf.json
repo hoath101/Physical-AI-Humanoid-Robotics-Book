@@ -5,7 +5,7 @@
   "source": "@site/docs/module-3-ai-perception/perception-navigation-pipeline-diagrams.md",
   "sourceDirName": "module-3-ai-perception",
   "slug": "/module-3-ai-perception/perception-navigation-pipeline-diagrams",
-  "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-3-ai-perception/perception-navigation-pipeline-diagrams",
+  "permalink": "/Physical-AI-Humanoid-Robotics-Book/docs/module-3-ai-perception/perception-navigation-pipeline-diagrams",
   "draft": false,
   "unlisted": false,
   "tags": [],
@@ -14,10 +14,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Nav2 for Humanoid Locomotion",
-    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-3-ai-perception/nav2-locomotion"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/docs/module-3-ai-perception/nav2-locomotion"
   },
   "next": {
     "title": "Practical Exercises with Isaac AI Components",
-    "permalink": "/Physical-AI-Humanoid-Robotics-Book/module-3-ai-perception/practical-exercises-isaac-ai"
+    "permalink": "/Physical-AI-Humanoid-Robotics-Book/docs/module-3-ai-perception/practical-exercises-isaac-ai"
   }
 }

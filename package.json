@@ -8,7 +8,7 @@
     "start": "docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy",
+    "deploy": "cross-env GIT_USER=hoath101 docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.0.0",
     "@docusaurus/types": "^3.0.0",
+    "cross-env": "^10.1.0",
     "gh-pages": "^6.3.0"
   },
   "browserslist": {

@@ -65,7 +65,7 @@ const config = {
             label: 'Book',
           },
           {
-            href: 'https://github.com/hoath101/physical-ai-humanoid-robotics-book',
+            href: 'https://github.com/hoath101/Physical-AI-Humanoid-Robotics-Book',
             label: 'GitHub',
             position: 'right',
           },
@@ -79,7 +79,7 @@ const config = {
             items: [
               {
                 label: 'Introduction',
-                to: '/Physical-AI-Humanoid-Robotics-Book/',
+                to: '/',
               },
             ],
           },

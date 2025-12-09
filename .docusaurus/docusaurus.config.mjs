@@ -25,8 +25,7 @@ export default {
       "classic",
       {
         "docs": {
-          "sidebarPath": "C:\\Users\\Baloch\\GIAIC-WORK\\hackathon-book\\sidebars.js",
-          "routeBasePath": ""
+          "sidebarPath": "C:\\Users\\Baloch\\GIAIC-WORK\\hackathon-book\\sidebars.js"
         },
         "blog": false,
         "theme": {
@@ -66,7 +65,7 @@ export default {
           "items": [
             {
               "label": "Introduction",
-              "to": "/"
+              "to": "/Physical-AI-Humanoid-Robotics-Book/"
             }
           ]
         },
