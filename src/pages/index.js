@@ -29,7 +29,7 @@ export default function Home() {
           className="button button--primary button--lg"
           to="/docs/intro"
         >
-          📘 Read the Book
+          📘 Start Reading
         </Link>
       </main>
     </Layout>
