@@ -19,7 +19,7 @@ const config = {
   organizationName: 'hoath101', // Usually your GitHub org/user name.
   projectName: 'Physical-AI-Humanoid-Robotics-Book', // Usually your repo name.
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -45,7 +45,7 @@ const config = {
       }),
     ],
   ],
-
+  
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -101,7 +101,7 @@ const config = {
             items: [
               {
                 label: 'GitHub',
-                href: 'https://github.com/hoath101/physical-ai-humanoid-robotics',
+                href: 'https://github.com/hoath101/Physical-AI-Humanoid-Robotics-Book',
               },
             ],
           },
@@ -110,9 +110,11 @@ const config = {
       },
       prism: {
         theme: require('prism-react-renderer').themes.github,
-        darkTheme: require('prism-react-renderer').themes.dracula,
       },
     }),
+    clientModules: [
+      require.resolve('./src/components/Root.js'),
+     ],
 };
 
 module.exports = config;

@@ -105,3 +105,21 @@ This educational content is provided for learning purposes in the field of Physi
 ## Acknowledgments
 
 This book leverages NVIDIA Isaac technologies and is designed to support the development of Physical AI capabilities in humanoid robotics.
+
+## RAG Chatbot Integration
+
+This repository includes a Retrieval-Augmented Generation (RAG) chatbot that allows users to ask questions about the book content. The chatbot uses:
+
+- OpenAI GPT models for natural language understanding
+- Vector embeddings for semantic search through book content
+- FastAPI backend for processing queries
+- Qdrant Cloud for vector storage and retrieval
+- Docusaurus integration for seamless user experience
+
+The RAG chatbot enables students to:
+- Ask questions about specific modules and concepts
+- Get explanations of complex robotics and AI topics
+- Search through the entire book content efficiently
+- Receive context-aware responses based on the educational material
+
+To use the chatbot functionality, see the setup instructions in the documentation or use the embedded widget on the website.

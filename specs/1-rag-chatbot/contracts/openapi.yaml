@@ -1,0 +1,220 @@
+# RAG Chatbot API Contract
+
+## Overview
+This document defines the API contracts for the RAG Chatbot system based on the functional requirements from the feature specification.
+
+## Base URL
+`/api/v1`
+
+## Authentication
+All endpoints require API key authentication via header:
+`Authorization: Bearer {API_KEY}`
+
+## Endpoints
+
+### 1. Ingest Book Content
+- **Endpoint**: `POST /ingest`
+- **Description**: Ingest and index book content for RAG operations
+- **Functional Requirement**: Supports FR-008 (content processing mechanism)
+
+#### Request
+```json
+{
+  "book_content": "Full text content of the book...",
+  "book_metadata": {
+    "title": "Book Title",
+    "author": "Author Name",
+    "isbn": "ISBN-13",
+    "edition": "Edition Number"
+  },
+  "chunk_size": 1000,
+  "overlap_size": 200,
+  "book_id": "unique-book-identifier"
+}
+```
+
+#### Response (200 OK)
+```json
+{
+  "status": "success",
+  "message": "Book content successfully ingested and indexed",
+  "book_id": "unique-book-identifier",
+  "chunks_processed": 45,
+  "processing_time": "2.34s"
+}
+```
+
+#### Response (400 Bad Request)
+```json
+{
+  "status": "error",
+  "message": "Invalid input data",
+  "details": {
+    "book_content": "Content cannot be empty",
+    "book_id": "Book ID is required"
+  }
+}
+```
+
+### 2. Global Query
+- **Endpoint**: `POST /query`
+- **Description**: Query the entire book corpus for relevant information
+- **Functional Requirement**: Supports FR-001, FR-002, FR-003, FR-004, FR-005
+
+#### Request
+```json
+{
+  "question": "What are the key concepts in chapter 3?",
+  "query_mode": "global",
+  "book_id": "unique-book-identifier",
+  "top_k": 5,
+  "temperature": 0.3
+}
+```
+
+#### Response (200 OK)
+```json
+{
+  "answer": "The key concepts in chapter 3 include...",
+  "citations": [
+    {
+      "chapter": "Chapter 3",
+      "page": 45,
+      "section": "3.2 Key Concepts",
+      "paragraph_id": "p12",
+      "text_snippet": "The key concepts include..."
+    }
+  ],
+  "query_mode": "global",
+  "retrieved_context_count": 3,
+  "processing_time": "1.23s"
+}
+```
+
+#### Response (200 OK) - No Content Found
+```json
+{
+  "answer": "Not found in source text",
+  "citations": [],
+  "query_mode": "global",
+  "retrieved_context_count": 0,
+  "status": "no_content_found"
+}
+```
+
+### 3. Selection-Only Query
+- **Endpoint**: `POST /query/selection`
+- **Description**: Query only the selected text for relevant information
+- **Functional Requirement**: Supports FR-001, FR-002, FR-003, FR-004, FR-005
+
+#### Request
+```json
+{
+  "question": "Explain this concept?",
+  "query_mode": "selection_only",
+  "selected_text": "The concept of embodied intelligence refers to...",
+  "book_id": "unique-book-identifier",
+  "top_k": 3,
+  "temperature": 0.3
+}
+```
+
+#### Response (200 OK)
+```json
+{
+  "answer": "The concept of embodied intelligence refers to...",
+  "citations": [
+    {
+      "chapter": "Chapter 4",
+      "page": 67,
+      "section": "4.1 Embodied Intelligence",
+      "paragraph_id": "p5",
+      "text_snippet": "The concept of embodied intelligence refers to..."
+    }
+  ],
+  "query_mode": "selection_only",
+  "retrieved_context_count": 1,
+  "processing_time": "0.87s"
+}
+```
+
+#### Response (200 OK) - No Content Found
+```json
+{
+  "answer": "Not found in source text",
+  "citations": [],
+  "query_mode": "selection_only",
+  "retrieved_context_count": 0,
+  "status": "no_content_found"
+}
+```
+
+### 4. Health Check
+- **Endpoint**: `GET /health`
+- **Description**: Check the health status of the API
+
+#### Response (200 OK)
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-12-15T10:30:00Z",
+  "version": "1.0.0",
+  "dependencies": {
+    "qdrant": "connected",
+    "postgres": "connected",
+    "openai": "connected"
+  }
+}
+```
+
+## Common Error Responses
+
+### 401 Unauthorized
+```json
+{
+  "status": "error",
+  "message": "Invalid or missing API key"
+}
+```
+
+### 429 Rate Limited
+```json
+{
+  "status": "error",
+  "message": "Rate limit exceeded",
+  "retry_after": 60
+}
+```
+
+### 500 Internal Server Error
+```json
+{
+  "status": "error",
+  "message": "An internal server error occurred",
+  "error_id": "error-uuid"
+}
+```
+
+## Data Types
+
+### Book Metadata Object
+- `title`: string (required)
+- `author`: string (required)
+- `isbn`: string (optional)
+- `edition`: string (optional)
+- `publication_date`: string (optional, ISO 8601 format)
+
+### Citation Object
+- `chapter`: string
+- `page`: integer
+- `section`: string
+- `paragraph_id`: string
+- `text_snippet`: string
+
+### Query Parameters
+- `question`: string (required) - The user's question
+- `query_mode`: string (required) - "global" or "selection_only"
+- `book_id`: string (required) - Identifier for the book
+- `selected_text`: string (optional) - Required for selection_only mode
+- `top_k`: integer (optional, default: 5) - Number of results to retrieve
+- `temperature`: number (optional, default: 0.3) - LLM temperature setting
