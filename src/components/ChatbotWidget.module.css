@@ -1,105 +1,82 @@
-/* ChatbotWidget.module.css */
+/* Container for the chat widget */
+.chatContainer {
+  position: relative;
+  z-index: 9999;
+}
+
+/* Launcher button */
 .chatLauncher {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 9999;
-}
-
-.floatingButton {
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 50%;
   width: 60px;
   height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-}
-
-.floatingButton:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Additional styling for the chat button */
-.floatingButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
+  border-radius: 50%;
+  background-color: #10a37f;
+  color: white;
   border: none;
-  border-radius: 25px;
+  font-size: 1.5rem;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  min-width: 60px;
-  height: 60px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
-
-.chatButtonText {
-  margin-right: 8px;
-  font-weight: bold;
+.chatLauncher:hover {
+  background-color: #0d8a6a;
+  transform: scale(1.05);
 }
 
-.chatButtonIcon {
-  margin-left: 8px;
+.chatLauncher:focus {
+  outline: 2px solid #10a37f;
+  outline-offset: 2px;
 }
 
-.chatContainer {
+/* ChatKit Widget */
+.chatKitWidget {
   position: fixed;
-  bottom: 20px;
+  bottom: 80px; /* Adjust for launcher button */
   right: 20px;
-  width: 350px;
-  height: 500px;
-  max-height: 80vh;
-  background-color: white;
-  border-radius: 8px;
+  width: 400px;
+  height: 600px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
+  background-color: white;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
-.chatHeader {
-  background-color: #2563eb;
-  color: white;
-  padding: 16px;
+/* Widget Header */
+.widgetHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem;
+  background-color: #10a37f;
+  color: white;
+  cursor: pointer;
+  outline: none;
+  border: none;
 }
 
-.chatHeaderContent {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.chatIcon {
-  width: 24px;
-  height: 24px;
-}
-
-.chatHeader h3 {
+.widgetTitle {
   margin: 0;
-  font-size: 16px;
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
-.closeButton {
+.toggleButton {
   background: none;
   border: none;
   color: white;
-  font-size: 24px;
+  font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
   width: 30px;
@@ -107,161 +84,60 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.closeButton:hover {
-  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-}
-
-.chatMessages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background-color: #f9fafb;
-}
-
-.message {
-  max-width: 80%;
-  padding: 10px 14px;
-  border-radius: 18px;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.userMessage {
-  background-color: #2563eb;
-  color: white;
-  align-self: flex-end;
-  border-bottom-right-radius: 4px;
-}
-
-.botMessage {
-  background-color: #e2e8f0;
-  color: #1e293b;
-  align-self: flex-start;
-  border-bottom-left-radius: 4px;
-}
-
-.messageText {
-  margin: 0;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-.typingIndicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.typingIndicator span {
-  width: 8px;
-  height: 8px;
-  background-color: #64748b;
-  border-radius: 50%;
-  display: inline-block;
-  animation: typing 1.4s infinite ease-in-out;
-}
-
-.typingIndicator span:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.typingIndicator span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typingIndicator span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes typing {
-  0%, 60%, 100% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-5px);
-  }
-}
-
-.quickQuestions {
-  padding: 0 16px 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.quickQuestionButton {
-  background-color: #dbeafe;
-  border: 1px solid #93c5fd;
-  border-radius: 16px;
-  padding: 6px 12px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.quickQuestionButton:hover {
-  background-color: #bfdbfe;
-}
-
-.chatInputForm {
-  display: flex;
-  padding: 16px;
-  background-color: white;
-  border-top: 1px solid #e2e8f0;
-}
-
-.chatInput {
-  flex: 1;
-  padding: 10px 14px;
-  border: 1px solid #cbd5e1;
-  border-radius: 20px;
   outline: none;
-  font-size: 14px;
 }
 
-.chatInput:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+.toggleButton:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 0 4px #10a37f;
 }
 
-.sendButton {
-  background-color: #2563eb;
-  color: white;
+.toggleButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ChatKit Container */
+.chatKitContainer {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+}
+
+.chatKitFrame {
+  width: 100%;
+  height: 100%;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  margin-left: 10px;
-  cursor: pointer;
+  overflow: hidden;
+}
+
+/* Loading state */
+.loadingState {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 10;
+  flex-direction: column;
 }
 
-.sendButton:disabled {
-  background-color: #94a3b8;
-  cursor: not-allowed;
+.loadingState p {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
 }
 
-.sendButton:hover:not(:disabled) {
-  background-color: #1d4ed8;
-}
-
-/* Visually hidden class for accessibility */
-.visuallyHidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
+/* Responsive design */
+@media (max-width: 768px) {
+  .chatKitWidget {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 100px);
+    bottom: 20px;
+    right: 20px;
+    left: 20px;
+  }
 }

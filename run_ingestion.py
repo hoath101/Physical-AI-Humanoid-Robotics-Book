@@ -58,11 +58,11 @@ async def main():
 
     args = parser.parse_args()
 
-    print("🚀 Starting Physical AI & Humanoid Robotics Book ingestion pipeline...")
-    print(f"📚 Book directory: {args.book_directory}")
-    print(f"📏 Max chunk size: {args.max_chunk_size}")
-    print(f"🔄 Overlap: {args.overlap}")
-    print(f"🧪 Dry run: {args.dry_run}")
+    print("Starting Physical AI & Humanoid Robotics Book ingestion pipeline...")
+    print(f"Book directory: {args.book_directory}")
+    print(f"Max chunk size: {args.max_chunk_size}")
+    print(f"Overlap: {args.overlap}")
+    print(f"Dry run: {args.dry_run}")
     print("-" * 50)
 
     # Validate inputs
@@ -89,16 +89,16 @@ async def main():
         sys.exit(1)
 
     if args.dry_run:
-        print("⚠️  DRY RUN MODE - No data will be ingested")
-        print("📋 This would process and chunk the book content, but not store it anywhere")
+        print("WARNING: DRY RUN MODE - No data will be ingested")
+        print("This would process and chunk the book content, but not store it anywhere")
 
         # Show what sections would be processed
-        print("\n📖 Book sections that would be processed:")
+        print("\nBook sections that would be processed:")
         sections = get_all_book_sections()
         for section_key, section_info in sections.items():
             print(f"  - {section_key}: {section_info['title']}")
 
-        print("\n✅ Dry run completed successfully")
+        print("\nDry run completed successfully")
         return
 
     try:
@@ -116,7 +116,7 @@ async def main():
             overlap=args.overlap
         )
 
-        print("\n✅ Book ingestion completed successfully!")
+        print("\nBook ingestion completed successfully!")
 
         # Print summary
         from rag.retriever import RAGRetriever
@@ -124,16 +124,16 @@ async def main():
         chunk_count = await rag_retriever.get_chunk_count()
         sections = await rag_retriever.get_all_sections()
 
-        print(f"📊 Summary:")
+        print(f"Summary:")
         print(f"   Total chunks ingested: {chunk_count}")
         print(f"   Sections processed: {len(sections)}")
         print(f"   Unique sections: {', '.join(sections[:5])}{'...' if len(sections) > 5 else ''}")
 
     except KeyboardInterrupt:
-        print("\n⚠️  Ingestion interrupted by user")
+        print("\nIngestion interrupted by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Error during ingestion: {str(e)}")
+        print(f"\nError during ingestion: {str(e)}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

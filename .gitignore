@@ -60,7 +60,9 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
-.env*
+.env
+.env.local
+.env.*.local
 node_modules/
 dist/
 .docusaurus/

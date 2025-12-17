@@ -1,5 +1,6 @@
 import Layout from "@theme/Layout";
 import Link from "@docusaurus/Link";
+import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function Home() {
   return (
@@ -31,6 +32,7 @@ export default function Home() {
         >
           📘 Start Reading
         </Link>
+        <ChatbotWidget/>
       </main>
     </Layout>
   );

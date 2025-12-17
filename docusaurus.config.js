@@ -49,6 +49,13 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      // Chatbot configuration - only non-sensitive values that can be exposed to client
+      chatkit: {
+        enabled: true,
+        title: 'Book Assistant',
+        initialOpen: false,
+        // Sensitive configuration like client tokens should be handled on the backend
+      },
       // Replace with your project's social card
       navbar: {
         title: 'Physical AI & Humanoid Robotics',

@@ -65,6 +65,13 @@ All assets (URDFs, worlds, example code) must be included in the repository.
 - All technical explanations are validated by robotics experts or documentation.
 - Book passes fact-checking, plagiarism scan, and technical reproducibility tests.
 
+
+## Project Scope Update
+
+- **RAG Backend:** Fully implemented, serving book content for retrieval-augmented queries.
+- **ChatKit Frontend:** Planned for integration to provide an interactive chat interface on all book pages. Will be built in React, wrapped in `ChatProvider`, and call the existing `/api/chat` endpoint.
+- Backend API will remain unchanged; frontend changes are isolated.
+
 ## Governance
 
 The constitution supersedes all other practices. Amendments require documentation, approval, and a migration plan. All PRs/reviews must verify compliance. Complexity must be justified.
