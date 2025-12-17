@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  title: Chat API Integration Contract
+  description: API contract for integrating ChatKit with existing backend
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /api/chat:
+    post:
+      summary: Send chat message to backend
+      description: Send a user message to the backend and receive an assistant response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  description: The user's message content
+                  example: "What is the main concept of embodied intelligence?"
+                history:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChatMessage'
+                  description: Previous conversation history
+                metadata:
+                  type: object
+                  description: Additional context information
+                  properties:
+                    selectedText:
+                      type: string
+                      description: Text selected by user in the book content
+      responses:
+        '200':
+          description: Successful response from the assistant
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - response
+                properties:
+                  response:
+                    type: string
+                    description: The assistant's response to the user's message
+                    example: "Embodied intelligence refers to the concept that intelligence emerges from the interaction between an agent and its environment..."
+                  citations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Citation'
+                    description: Optional citation information for the response
+        '400':
+          description: Bad request - invalid message format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ChatMessage:
+      type: object
+      required:
+        - id
+        - content
+        - role
+        - timestamp
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the message
+          example: "msg_1234567890_user"
+        content:
+          type: string
+          description: The message content
+          example: "What is embodied intelligence?"
+        role:
+          type: string
+          enum: [user, assistant, system]
+          description: The role of the message sender
+          example: "user"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the message was created
+          example: "2025-12-15T10:30:00Z"
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+          description: Optional citations for assistant messages
+
+    Citation:
+      type: object
+      properties:
+        chapter:
+          type: string
+          description: Book chapter reference
+          example: "Chapter 3"
+        section:
+          type: string
+          description: Book section reference
+          example: "3.2 Embodied Cognition"
+        page:
+          type: string
+          description: Book page reference
+          example: "45"
+        text_snippet:
+          type: string
+          description: Quoted text snippet
+          example: "Intelligence is not just in the brain, but emerges from the interaction between agent and environment"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Failed to process the request"

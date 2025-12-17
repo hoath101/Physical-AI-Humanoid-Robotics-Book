@@ -1,355 +1,379 @@
+"""
+Ingestion pipeline for the Physical AI & Humanoid Robotics Book RAG Chatbot.
+Handles the processing of book content into vector embeddings for retrieval.
+"""
+
+import os
 import asyncio
 import hashlib
-import os
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 from pathlib import Path
-from dataclasses import dataclass
-import logging
-from dotenv import load_dotenv
-import aiofiles
+from datetime import datetime
+import PyPDF2
+import docx
+import json
 from openai import OpenAI
+from qdrant_client import QdrantClient
 from qdrant_client.http import models
-from db.database import db_manager, DocumentMetadata
-
-# Load environment variables
-load_dotenv()
+import logging
+from config.ingestion_config import get_config_value
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@dataclass
-class BookChunk:
-    """Data class representing a book chunk."""
-    id: str
-    content: str
-    document_id: str
-    section: str
-    chapter: str
-    page_numbers: str
-    source_file: str
-    chunk_index: int
-    metadata: Dict[str, Any]
 
 class BookIngestionPipeline:
-    def __init__(self, openai_client: OpenAI):
+    """
+    Comprehensive ingestion pipeline for processing book content into vector embeddings.
+    Supports multiple file formats and chunking strategies.
+    """
+
+    def __init__(self, openai_client: OpenAI, qdrant_client: QdrantClient = None):
         self.openai_client = openai_client
+        self.qdrant_client = qdrant_client or QdrantClient(
+            url=get_config_value('QDRANT_URL', 'http://localhost:6333')
+        )
+        self.collection_name = get_config_value('QDRANT_COLLECTION_NAME', 'book_chunks')
+        self.embedding_model = get_config_value('EMBEDDING_MODEL', 'text-embedding-3-small')
+        self.max_chunk_size = int(get_config_value('MAX_CHUNK_SIZE', '1000'))
+        self.overlap = int(get_config_value('CHUNK_OVERLAP', '100'))
 
-        # Import here to avoid circular dependencies
-        from rag.retriever import RAGRetriever
-        self.rag_retriever = RAGRetriever(openai_client)
-
-    async def initialize_system(self):
-        """Initialize the ingestion system components."""
+    async def initialize_collection(self):
+        """Initialize the Qdrant collection for storing book chunks."""
         try:
-            # Initialize Qdrant collection
-            await self.rag_retriever.initialize_collection()
+            # Check if collection exists
+            collections = await self.qdrant_client.get_collections()
+            collection_names = [col.name for col in collections.collections]
 
-            # Connect to database
-            await db_manager.connect()
+            if self.collection_name not in collection_names:
+                # Create collection with appropriate vector size
+                await self.qdrant_client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=models.VectorParams(
+                        size=1536,  # Default size for text-embedding-3-small
+                        distance=models.Distance.COSINE
+                    )
+                )
+                logger.info(f"Created Qdrant collection: {self.collection_name}")
+            else:
+                logger.info(f"Qdrant collection {self.collection_name} already exists")
 
-            logger.info("Book ingestion system initialized successfully")
         except Exception as e:
-            logger.error(f"Error initializing ingestion system: {str(e)}")
+            logger.error(f"Error initializing Qdrant collection: {e}")
             raise
 
-    def _generate_chunk_id(self, content: str, document_id: str, chunk_index: int) -> str:
-        """Generate a unique ID for a chunk based on content hash."""
-        content_hash = hashlib.sha256(f"{content}{document_id}{chunk_index}".encode()).hexdigest()
-        return f"chunk_{content_hash[:16]}"
+    def extract_text_from_pdf(self, pdf_path: str) -> str:
+        """Extract text content from a PDF file."""
+        text = ""
+        try:
+            with open(pdf_path, 'rb') as file:
+                pdf_reader = PyPDF2.PdfReader(file)
+                for page in pdf_reader.pages:
+                    text += page.extract_text() + "\n"
+        except Exception as e:
+            logger.error(f"Error extracting text from PDF {pdf_path}: {e}")
+            raise
+        return text
 
-    def _generate_document_id(self, title: str, source_file: str) -> str:
-        """Generate a unique ID for a document."""
-        content_hash = hashlib.sha256(f"{title}{source_file}".encode()).hexdigest()
-        return f"doc_{content_hash[:16]}"
+    def extract_text_from_docx(self, docx_path: str) -> str:
+        """Extract text content from a DOCX file."""
+        try:
+            doc = docx.Document(docx_path)
+            text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+            return text
+        except Exception as e:
+            logger.error(f"Error extracting text from DOCX {docx_path}: {e}")
+            raise
 
-    def chunk_text(
-        self,
-        text: str,
-        max_chunk_size: int = 1000,
-        overlap: int = 100,
-        section: str = "",
-        chapter: str = "",
-        page_numbers: str = "",
-        source_file: str = ""
-    ) -> List[BookChunk]:
+    def extract_text_from_txt(self, txt_path: str) -> str:
+        """Extract text content from a TXT file."""
+        try:
+            with open(txt_path, 'r', encoding='utf-8') as file:
+                return file.read()
+        except Exception as e:
+            logger.error(f"Error extracting text from TXT {txt_path}: {e}")
+            raise
+
+    def extract_text_from_json(self, json_path: str) -> str:
+        """Extract text content from a JSON file (assuming book content format)."""
+        try:
+            with open(json_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+
+                # Handle different JSON structures
+                if isinstance(data, str):
+                    return data
+                elif isinstance(data, list):
+                    return " ".join([str(item) for item in data])
+                elif isinstance(data, dict):
+                    # Look for common book content keys
+                    content_keys = ['content', 'text', 'body', 'chapters', 'sections']
+                    for key in content_keys:
+                        if key in data:
+                            if isinstance(data[key], str):
+                                return data[key]
+                            elif isinstance(data[key], list):
+                                return " ".join([str(item) for item in data[key]])
+                    # If no common keys found, convert entire dict to string
+                    return json.dumps(data)
+                else:
+                    return str(data)
+        except Exception as e:
+            logger.error(f"Error extracting text from JSON {json_path}: {e}")
+            raise
+
+    def split_text(self, text: str, max_chunk_size: int, overlap: int) -> List[Dict[str, Any]]:
         """
-        Split text into chunks of specified size with overlap.
+        Split text into overlapping chunks with metadata.
 
         Args:
-            text: The text to chunk
-            max_chunk_size: Maximum size of each chunk in characters
-            overlap: Number of overlapping characters between chunks
-            section: Section identifier
-            chapter: Chapter identifier
-            page_numbers: Page numbers
-            source_file: Source file path
+            text: The text to split
+            max_chunk_size: Maximum size of each chunk
+            overlap: Number of characters to overlap between chunks
 
         Returns:
-            List of BookChunk objects
+            List of chunk dictionaries with content and metadata
         """
+        if not text.strip():
+            return []
+
         chunks = []
         start = 0
-        chunk_index = 0
+        chunk_id = 0
 
         while start < len(text):
-            # Calculate end position
+            # Determine the end position
             end = start + max_chunk_size
 
             # If we're near the end, include the rest
-            if end > len(text):
+            if end >= len(text):
                 end = len(text)
+            else:
+                # Try to break at sentence boundary
+                while end > start + max_chunk_size // 2 and end < len(text) and text[end] not in '.!?':
+                    end += 1
+                # If we couldn't find a good break point, just use max_chunk_size
+                if end <= start + max_chunk_size // 2:
+                    end = start + max_chunk_size
 
             # Extract the chunk
-            chunk_content = text[start:end]
-
-            # Create chunk ID
-            document_id = self._generate_document_id(section, source_file)
-            chunk_id = self._generate_chunk_id(chunk_content, document_id, chunk_index)
-
-            # Create BookChunk object
-            chunk = BookChunk(
-                id=chunk_id,
-                content=chunk_content,
-                document_id=document_id,
-                section=section,
-                chapter=chapter,
-                page_numbers=page_numbers,
-                source_file=source_file,
-                chunk_index=chunk_index,
-                metadata={
-                    "section": section,
-                    "chapter": chapter,
-                    "page_numbers": page_numbers,
-                    "source_file": source_file,
-                    "chunk_index": chunk_index
+            chunk_text = text[start:end].strip()
+            if chunk_text:
+                chunk = {
+                    'id': f'chunk_{chunk_id}',
+                    'content': chunk_text,
+                    'metadata': {
+                        'start_pos': start,
+                        'end_pos': end,
+                        'chunk_id': chunk_id,
+                        'total_length': len(text)
+                    }
                 }
-            )
+                chunks.append(chunk)
+                chunk_id += 1
 
-            chunks.append(chunk)
+            # Move start position with overlap
+            start = end - overlap if overlap < end else end
 
-            # Move start position forward, accounting for overlap
-            start = end - overlap
-            chunk_index += 1
-
-            # Prevent infinite loop if overlap is too large
-            if overlap >= max_chunk_size:
-                break
-
-        logger.info(f"Split text into {len(chunks)} chunks")
         return chunks
 
-    async def process_markdown_file(
-        self,
-        file_path: str,
-        section: str,
-        chapter: str = "",
-        max_chunk_size: int = 1000,
-        overlap: int = 100
-    ) -> List[BookChunk]:
+    def extract_metadata_from_content(self, content: str, file_path: str) -> Dict[str, Any]:
         """
-        Process a markdown file and split it into chunks.
+        Extract metadata from content and file path.
 
         Args:
-            file_path: Path to the markdown file
-            section: Section identifier
-            chapter: Chapter identifier
-            max_chunk_size: Maximum size of each chunk in characters
-            overlap: Number of overlapping characters between chunks
+            content: The text content
+            file_path: Path to the source file
 
         Returns:
-            List of BookChunk objects
+            Dictionary of metadata
+        """
+        # Basic metadata extraction
+        metadata = {
+            'file_path': str(file_path),
+            'file_name': Path(file_path).name,
+            'file_extension': Path(file_path).suffix,
+            'file_size': os.path.getsize(file_path),
+            'content_length': len(content),
+            'created_at': str(datetime.now()),
+        }
+
+        # Try to extract more specific book-related metadata
+        try:
+            # Look for chapter/section patterns in the content
+            import re
+
+            # Look for chapter titles (common patterns)
+            chapter_patterns = [
+                r'Chapter\s+(\d+)[\s:\-\—]*([^\n\r]+)',
+                r'#\s*Chapter\s+(\d+)[\s:\-\—]*([^\n\r]+)',
+                r'##\s*Chapter\s+(\d+)[\s:\-\—]*([^\n\r]+)',
+                r'CHAPTER\s+(\d+)[\s:\-\—]*([^\n\r]+)',
+            ]
+
+            for pattern in chapter_patterns:
+                match = re.search(pattern, content[:1000], re.IGNORECASE)  # Look in first 1000 chars
+                if match:
+                    metadata['chapter_number'] = match.group(1)
+                    metadata['chapter_title'] = match.group(2).strip()
+                    break
+
+            # Look for section titles
+            section_patterns = [
+                r'Section\s+(\d+)[\s:\-\—]*([^\n\r]+)',
+                r'#\s*([^\n\r]+)',
+                r'##\s*([^\n\r]+)',
+            ]
+
+            for pattern in section_patterns:
+                match = re.search(pattern, content[:500], re.IGNORECASE)  # Look in first 500 chars
+                if match and 'section_title' not in metadata:
+                    metadata['section_title'] = match.group(1).strip()
+                    break
+
+        except Exception as e:
+            logger.warning(f"Error extracting content metadata: {e}")
+
+        return metadata
+
+    async def create_embeddings(self, texts: List[str]) -> List[List[float]]:
+        """
+        Create embeddings for a list of texts using OpenAI API.
+
+        Args:
+            texts: List of texts to embed
+
+        Returns:
+            List of embedding vectors
         """
         try:
-            async with aiofiles.open(file_path, 'r', encoding='utf-8') as f:
-                content = await f.read()
-
-            # Extract page numbers if available in the file content
-            page_numbers = self._extract_page_numbers(content)
-
-            # Chunk the content
-            chunks = self.chunk_text(
-                content,
-                max_chunk_size=max_chunk_size,
-                overlap=overlap,
-                section=section,
-                chapter=chapter,
-                page_numbers=page_numbers,
-                source_file=str(file_path)
+            response = self.openai_client.embeddings.create(
+                model=self.embedding_model,
+                input=texts
             )
-
-            logger.info(f"Processed markdown file {file_path}: {len(chunks)} chunks generated")
-            return chunks
+            embeddings = [item.embedding for item in response.data]
+            return embeddings
         except Exception as e:
-            logger.error(f"Error processing markdown file {file_path}: {str(e)}")
+            logger.error(f"Error creating embeddings: {e}")
             raise
 
-    def _extract_page_numbers(self, content: str) -> str:
-        """Extract page numbers from content if available."""
-        # This is a simple implementation - could be enhanced based on actual content format
-        # Look for common page number patterns in the content
-        lines = content.split('\n')
-        for line in lines[:10]:  # Check first 10 lines
-            if line.strip().startswith('Page ') or line.strip().endswith('Page'):
-                return line.strip()
-        return ""
-
-    async def process_docusaurus_docs(
-        self,
-        docs_dir: str,
-        max_chunk_size: int = 1000,
-        overlap: int = 100
-    ) -> List[BookChunk]:
+    async def process_file(self, file_path: str) -> List[Dict[str, Any]]:
         """
-        Process all markdown files in a Docusaurus docs directory.
+        Process a single file into chunks with embeddings.
 
         Args:
-            docs_dir: Path to the Docusaurus docs directory
-            max_chunk_size: Maximum size of each chunk in characters
-            overlap: Number of overlapping characters between chunks
+            file_path: Path to the file to process
 
         Returns:
-            List of all BookChunk objects from all files
+            List of processed chunks with embeddings
         """
-        all_chunks = []
+        logger.info(f"Processing file: {file_path}")
 
-        docs_path = Path(docs_dir)
-        markdown_files = list(docs_path.rglob("*.md")) + list(docs_path.rglob("*.mdx"))
+        # Extract text based on file extension
+        file_ext = Path(file_path).suffix.lower()
+        if file_ext == '.pdf':
+            content = self.extract_text_from_pdf(file_path)
+        elif file_ext == '.docx':
+            content = self.extract_text_from_docx(file_path)
+        elif file_ext == '.txt':
+            content = self.extract_text_from_txt(file_path)
+        elif file_ext == '.json':
+            content = self.extract_text_from_json(file_path)
+        else:
+            raise ValueError(f"Unsupported file format: {file_ext}")
 
-        logger.info(f"Found {len(markdown_files)} markdown files in {docs_dir}")
+        # Split content into chunks
+        chunks = self.split_text(content, self.max_chunk_size, self.overlap)
 
-        for md_file in markdown_files:
-            # Determine section and chapter from file path
-            relative_path = md_file.relative_to(docs_path)
-            parts = str(relative_path).split(os.sep)
+        # Add metadata to each chunk
+        for chunk in chunks:
+            chunk['metadata'].update(self.extract_metadata_from_content(content, file_path))
+            chunk['metadata']['source_file'] = str(file_path)
 
-            section = parts[0] if len(parts) > 0 else "unknown"
-            chapter = parts[1] if len(parts) > 1 else "unknown"
+        # Create embeddings for all chunks
+        if chunks:
+            texts = [chunk['content'] for chunk in chunks]
+            embeddings = await self.create_embeddings(texts)
 
-            # Skip certain files that are not content (like sidebar configs)
-            if any(skip in str(md_file) for skip in ['sidebar', 'toc']):
-                continue
+            # Add embeddings to chunks
+            for i, chunk in enumerate(chunks):
+                chunk['embedding'] = embeddings[i]
 
-            try:
-                file_chunks = await self.process_markdown_file(
-                    str(md_file),
-                    section=section,
-                    chapter=chapter,
-                    max_chunk_size=max_chunk_size,
-                    overlap=overlap
-                )
-                all_chunks.extend(file_chunks)
-            except Exception as e:
-                logger.error(f"Error processing file {md_file}: {str(e)}")
-                continue
+        logger.info(f"Processed {len(chunks)} chunks from {file_path}")
+        return chunks
 
-        logger.info(f"Processed {len(all_chunks)} total chunks from {docs_dir}")
-        return all_chunks
-
-    async def ingest_chunks(self, chunks: List[BookChunk]):
+    async def store_chunks_in_qdrant(self, chunks: List[Dict[str, Any]]):
         """
-        Ingest chunks into Qdrant and Neon Postgres.
+        Store processed chunks in Qdrant vector database.
 
         Args:
-            chunks: List of BookChunk objects to ingest
+            chunks: List of processed chunks to store
         """
-        logger.info(f"Starting ingestion of {len(chunks)} chunks...")
+        if not chunks:
+            return
 
-        for i, chunk in enumerate(chunks):
-            try:
-                # Add chunk to Qdrant (vector database)
-                await self.rag_retriever.add_document_chunk(
-                    content=chunk.content,
-                    doc_id=chunk.id,
-                    section=chunk.section,
-                    chapter=chunk.chapter,
-                    page=chunk.page_numbers,
-                    source_file=chunk.source_file
-                )
+        points = []
+        for chunk in chunks:
+            point = models.PointStruct(
+                id=hashlib.md5(f"{chunk['metadata']['source_file']}_{chunk['metadata']['chunk_id']}".encode()).hexdigest(),
+                vector=chunk['embedding'],
+                payload={
+                    'content': chunk['content'],
+                    'metadata': chunk['metadata']
+                }
+            )
+            points.append(point)
 
-                # Save chunk metadata to Neon Postgres
-                await db_manager.save_document_chunk(
-                    chunk_id=chunk.id,
-                    document_id=chunk.document_id,
-                    content=chunk.content,
-                    chunk_index=chunk.chunk_index,
-                    section=chunk.section,
-                    chapter=chunk.chapter,
-                    page_numbers=chunk.page_numbers,
-                    source_file=chunk.source_file,
-                    embedding_id=chunk.id  # Using chunk ID as embedding ID
-                )
+        # Upload points to Qdrant
+        await self.qdrant_client.upsert(
+            collection_name=self.collection_name,
+            points=points
+        )
 
-                # Update document metadata in database
-                document_metadata = DocumentMetadata(
-                    id=chunk.document_id,
-                    title=chunk.section,
-                    section=chunk.section,
-                    chapter=chunk.chapter,
-                    page_numbers=chunk.page_numbers,
-                    source_file=chunk.source_file,
-                    created_at="",
-                    updated_at="",
-                    embedding_count=0  # This will be updated in the DB manager
-                )
-                await db_manager.save_document_metadata(document_metadata)
+        logger.info(f"Stored {len(points)} chunks in Qdrant collection {self.collection_name}")
 
-                if (i + 1) % 50 == 0:  # Log progress every 50 chunks
-                    logger.info(f"Ingested {i + 1}/{len(chunks)} chunks...")
-
-            except Exception as e:
-                logger.error(f"Error ingesting chunk {chunk.id}: {str(e)}")
-                continue
-
-        logger.info(f"Completed ingestion of {len(chunks)} chunks")
-
-    async def ingest_book_from_directory(
-        self,
-        book_directory: str,
-        max_chunk_size: int = 1000,
-        overlap: int = 100
-    ):
+    async def process_directory(self, directory_path: str) -> int:
         """
-        Complete ingestion pipeline for a book directory.
+        Process all supported files in a directory.
 
         Args:
-            book_directory: Path to the book directory containing markdown files
-            max_chunk_size: Maximum size of each chunk in characters
-            overlap: Number of overlapping characters between chunks
+            directory_path: Path to directory containing book files
+
+        Returns:
+            Number of files processed
         """
-        logger.info(f"Starting book ingestion from directory: {book_directory}")
+        directory = Path(directory_path)
+        if not directory.exists() or not directory.is_dir():
+            raise ValueError(f"Directory does not exist: {directory_path}")
 
-        # Initialize the system
-        await self.initialize_system()
+        # Supported file extensions
+        supported_extensions = {'.pdf', '.docx', '.txt', '.json'}
 
-        # Process all markdown files in the directory
-        chunks = await self.process_docusaurus_docs(
-            book_directory,
-            max_chunk_size=max_chunk_size,
-            overlap=overlap
-        )
+        files_to_process = []
+        for ext in supported_extensions:
+            files_to_process.extend(directory.glob(f"*{ext}"))
+            files_to_process.extend(directory.glob(f"**/*{ext}"))  # Include subdirectories
 
-        # Ingest all chunks
-        await self.ingest_chunks(chunks)
+        total_chunks = 0
+        processed_files = 0
 
-        logger.info("Book ingestion completed successfully")
+        for file_path in files_to_process:
+            try:
+                chunks = await self.process_file(str(file_path))
+                if chunks:
+                    await self.store_chunks_in_qdrant(chunks)
+                    total_chunks += len(chunks)
+                    processed_files += 1
+                    logger.info(f"Successfully processed {file_path} ({len(chunks)} chunks)")
+            except Exception as e:
+                logger.error(f"Error processing file {file_path}: {e}")
+                continue  # Continue with other files
 
-    async def update_document_metadata(self, document_id: str, title: str, section: str):
-        """Update document metadata in the database."""
-        metadata = DocumentMetadata(
-            id=document_id,
-            title=title,
-            section=section,
-            chapter="",
-            page_numbers="",
-            source_file="",
-            created_at="",
-            updated_at="",
-            embedding_count=0
-        )
-        await db_manager.save_document_metadata(metadata)
+        logger.info(f"Completed processing. Total: {processed_files} files, {total_chunks} chunks stored.")
+        return processed_files
 
-# Convenience function to run the ingestion pipeline
+
 async def run_ingestion_pipeline(
     book_directory: str,
     openai_client: OpenAI,
@@ -357,17 +381,58 @@ async def run_ingestion_pipeline(
     overlap: int = 100
 ):
     """
-    Run the complete book ingestion pipeline.
+    Main function to run the book ingestion pipeline.
 
     Args:
-        book_directory: Path to the book directory containing markdown files
+        book_directory: Directory containing book files to process
         openai_client: Initialized OpenAI client
-        max_chunk_size: Maximum size of each chunk in characters
-        overlap: Number of overlapping characters between chunks
+        max_chunk_size: Maximum size of text chunks
+        overlap: Overlap between chunks
     """
-    ingestion_pipeline = BookIngestionPipeline(openai_client)
-    await ingestion_pipeline.ingest_book_from_directory(
-        book_directory,
-        max_chunk_size=max_chunk_size,
-        overlap=overlap
-    )
+    logger.info(f"Starting ingestion pipeline for directory: {book_directory}")
+
+    # Update config values for this run
+    import config.ingestion_config as config_module
+    config_module._config_values['MAX_CHUNK_SIZE'] = str(max_chunk_size)
+    config_module._config_values['CHUNK_OVERLAP'] = str(overlap)
+
+    # Create ingestion pipeline instance
+    pipeline = BookIngestionPipeline(openai_client)
+
+    try:
+        # Initialize Qdrant collection
+        await pipeline.initialize_collection()
+
+        # Process the directory
+        processed_files = await pipeline.process_directory(book_directory)
+
+        logger.info(f"Ingestion pipeline completed. Processed {processed_files} files.")
+        return processed_files
+
+    except Exception as e:
+        logger.error(f"Error in ingestion pipeline: {e}")
+        raise
+
+
+# Additional utility functions
+async def reinitialize_collection(collection_name: Optional[str] = None):
+    """Reinitialize the Qdrant collection (useful for clearing/restarting)."""
+    pipeline = BookIngestionPipeline(OpenAI())  # Dummy client for initialization only
+    if collection_name:
+        pipeline.collection_name = collection_name
+    await pipeline.initialize_collection()
+
+
+def get_supported_file_types() -> List[str]:
+    """Get list of supported file types for ingestion."""
+    return ['.pdf', '.docx', '.txt', '.json']
+
+
+if __name__ == "__main__":
+    # Example usage (this would typically be called from the main API)
+    import os
+    from openai import OpenAI
+    from datetime import datetime
+
+    # This is just for testing - in production this would be called from main.py
+    print("Ingestion pipeline module loaded. Use run_ingestion_pipeline() to process files.")

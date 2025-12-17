@@ -1,338 +1,430 @@
-import asyncio
-from typing import List, Dict, Any, Optional
-from qdrant_client import AsyncQdrantClient
-from qdrant_client.http import models
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
-import logging
+"""
+RAG (Retrieval-Augmented Generation) retriever for the Physical AI & Humanoid Robotics Book RAG Chatbot.
+Handles vector search and document retrieval for question answering.
+"""
 
-# Load environment variables
-load_dotenv()
+import asyncio
+import logging
+from typing import List, Dict, Any, Optional
+from openai import OpenAI
+from qdrant_client import QdrantClient
+from qdrant_client.http import models
+from qdrant_client.http.models import Filter, FieldCondition, MatchValue
+from config.ingestion_config import get_config_value
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class RAGRetriever:
+    """
+    RAG (Retrieval-Augmented Generation) retriever that performs vector similarity search
+    to find relevant book content for answering user questions.
+    """
+
     def __init__(self, openai_client: OpenAI):
-        # Initialize Qdrant client for vector search
-        self.qdrant_client = AsyncQdrantClient(
-            url=os.getenv("QDRANT_URL"),
-            api_key=os.getenv("QDRANT_API_KEY"),
-            prefer_grpc=True
-        )
-
-        # Set up OpenAI client for embedding generation
         self.openai_client = openai_client
-
-        # Collection name for book chunks
-        self.collection_name = os.getenv("QDRANT_COLLECTION_NAME", "book_chunks")
+        self.qdrant_client = QdrantClient(
+            url=get_config_value('QDRANT_URL', 'http://localhost:6333')
+        )
+        self.collection_name = get_config_value('QDRANT_COLLECTION_NAME', 'book_chunks')
+        self.embedding_model = get_config_value('EMBEDDING_MODEL', 'text-embedding-3-small')
+        self.default_top_k = int(get_config_value('DEFAULT_TOP_K', '5'))
+        self.search_threshold = float(get_config_value('SEARCH_THRESHOLD', '0.3'))
 
     async def initialize_collection(self):
         """Initialize the Qdrant collection if it doesn't exist."""
         try:
+            # Check if collection exists
             collections = await self.qdrant_client.get_collections()
-            collection_names = [collection.name for collection in collections.collections]
+            collection_names = [col.name for col in collections.collections]
 
             if self.collection_name not in collection_names:
-                # Create collection with appropriate vector size for OpenAI embeddings
+                # Create collection with appropriate vector size
                 await self.qdrant_client.create_collection(
                     collection_name=self.collection_name,
-                    vectors_config=models.VectorParams(size=1536, distance=models.Distance.COSINE),
+                    vectors_config=models.VectorParams(
+                        size=1536,  # Default size for text-embedding-3-small
+                        distance=models.Distance.COSINE
+                    )
                 )
-
-                # Create index for faster filtering on section field
-                await self.qdrant_client.create_payload_index(
-                    collection_name=self.collection_name,
-                    field_name="section",
-                    field_schema=models.PayloadSchemaType.KEYWORD
-                )
-
-                logger.info(f"Created collection '{self.collection_name}' in Qdrant with indexes")
+                logger.info(f"Created Qdrant collection: {self.collection_name}")
             else:
-                logger.info(f"Collection '{self.collection_name}' already exists in Qdrant")
-        except Exception as e:
-            logger.error(f"Error initializing Qdrant collection: {str(e)}")
-            raise
+                logger.info(f"Qdrant collection {self.collection_name} already exists")
 
-    async def generate_embedding(self, text: str) -> List[float]:
-        """Generate embedding for a given text using OpenAI."""
+        except Exception as e:
+            logger.error(f"Error initializing Qdrant collection: {e}")
+            # Log the error but don't raise it - allow the app to start even if Qdrant is not available
+            # This allows the application to start for development purposes
+            logger.warning("Qdrant not available - search functionality will be disabled until Qdrant is running")
+
+    async def create_embedding(self, text: str) -> List[float]:
+        """
+        Create embedding for a single text using OpenAI API.
+
+        Args:
+            text: Text to embed
+
+        Returns:
+            Embedding vector as a list of floats
+        """
         try:
             response = self.openai_client.embeddings.create(
-                input=text,
-                model="text-embedding-ada-002"
+                model=self.embedding_model,
+                input=text
             )
             return response.data[0].embedding
         except Exception as e:
-            logger.error(f"Error generating embedding: {str(e)}")
+            logger.error(f"Error creating embedding: {e}")
             raise
 
     async def retrieve_relevant_chunks(
         self,
         query: str,
         book_section: Optional[str] = None,
-        top_k: int = 5
+        top_k: Optional[int] = None,
+        threshold: Optional[float] = None
     ) -> List[Dict[str, Any]]:
-        """Retrieve relevant text chunks from the vector database based on the query."""
-        try:
-            # Generate embedding for the query
-            query_embedding = await self.generate_embedding(query)
-
-            # Prepare filters
-            filters = []
-            if book_section:
-                filters.append(models.FieldCondition(
-                    key="section",
-                    match=models.MatchValue(value=book_section)
-                ))
-
-            # Convert filters to a single filter if there are any
-            filter_obj = None
-            if filters:
-                filter_obj = models.Filter(must=filters)
-
-            # Perform semantic search in Qdrant
-            search_results = await self.qdrant_client.search(
-                collection_name=self.collection_name,
-                query_vector=query_embedding,
-                query_filter=filter_obj,
-                limit=top_k,
-                with_payload=True,
-                with_vectors=False
-            )
-
-            # Format results
-            retrieved_chunks = []
-            for hit in search_results:
-                chunk_data = {
-                    "content": hit.payload.get("content", ""),
-                    "metadata": {
-                        "id": hit.id,
-                        "section": hit.payload.get("section", ""),
-                        "chapter": hit.payload.get("chapter", ""),
-                        "page": hit.payload.get("page", ""),
-                        "source_file": hit.payload.get("source_file", ""),
-                        "score": hit.score
-                    }
-                }
-                retrieved_chunks.append(chunk_data)
-
-            logger.info(f"Retrieved {len(retrieved_chunks)} relevant chunks for query: {query[:50]}...")
-            return retrieved_chunks
-
-        except Exception as e:
-            logger.error(f"Error retrieving relevant chunks: {str(e)}")
-            raise
-
-    async def add_document_chunk(
-        self,
-        content: str,
-        doc_id: str,
-        section: str,
-        chapter: str = "",
-        page: str = "",
-        source_file: str = ""
-    ):
-        """Add a document chunk to the vector database."""
-        try:
-            # Generate embedding for the content
-            embedding = await self.generate_embedding(content)
-
-            # Prepare the payload
-            payload = {
-                "content": content,
-                "section": section,
-                "chapter": chapter,
-                "page": page,
-                "source_file": source_file,
-                "doc_id": doc_id
-            }
-
-            # Upsert the point in Qdrant
-            await self.qdrant_client.upsert(
-                collection_name=self.collection_name,
-                points=[
-                    models.PointStruct(
-                        id=doc_id,
-                        vector=embedding,
-                        payload=payload
-                    )
-                ]
-            )
-
-            logger.info(f"Added document chunk to Qdrant with ID: {doc_id}")
-
-        except Exception as e:
-            logger.error(f"Error adding document chunk: {str(e)}")
-            raise
-
-    async def bulk_add_document_chunks(self, chunks_data: List[Dict[str, Any]]) -> int:
         """
-        Bulk add multiple document chunks to the vector database.
+        Retrieve the most relevant text chunks for a given query.
 
         Args:
-            chunks_data: List of dictionaries containing content, doc_id, section, etc.
+            query: User's question or query text
+            book_section: Optional section/chapter to limit search to
+            top_k: Number of top results to return (defaults to config value)
+            threshold: Minimum similarity threshold for results
 
         Returns:
-            Number of successfully added chunks
+            List of relevant chunks with content and metadata
         """
+        if not query.strip():
+            return []
+
+        top_k = top_k or self.default_top_k
+        threshold = threshold or self.search_threshold
+
         try:
-            # Prepare points for bulk insertion
-            points = []
-            for chunk_data in chunks_data:
-                content = chunk_data['content']
-                doc_id = chunk_data['doc_id']
-                section = chunk_data.get('section', '')
-                chapter = chunk_data.get('chapter', '')
-                page = chunk_data.get('page', '')
-                source_file = chunk_data.get('source_file', '')
+            # Create embedding for the query
+            query_embedding = await self.create_embedding(query)
 
-                # Generate embedding for the content
-                embedding = await self.generate_embedding(content)
-
-                # Prepare the payload
-                payload = {
-                    "content": content,
-                    "section": section,
-                    "chapter": chapter,
-                    "page": page,
-                    "source_file": source_file,
-                    "doc_id": doc_id
-                }
-
-                # Create point struct
-                point = models.PointStruct(
-                    id=doc_id,
-                    vector=embedding,
-                    payload=payload
+            # Build search filter if book_section is specified
+            search_filter = None
+            if book_section:
+                search_filter = Filter(
+                    must=[
+                        FieldCondition(
+                            key="metadata.section_title",
+                            match=MatchValue(value=book_section)
+                        )
+                    ]
                 )
 
-                points.append(point)
-
-            # Bulk upsert points in batches (Qdrant recommends keeping batches under 64KB)
-            batch_size = 50  # Adjust based on average chunk size
-            successful_count = 0
-
-            for i in range(0, len(points), batch_size):
-                batch = points[i:i + batch_size]
-                await self.qdrant_client.upsert(
-                    collection_name=self.collection_name,
-                    points=batch
-                )
-                successful_count += len(batch)
-
-                logger.info(f"Bulk added batch of {len(batch)} chunks ({successful_count}/{len(points)} total)")
-
-            logger.info(f"Successfully added {successful_count} document chunks to Qdrant")
-            return successful_count
-
-        except Exception as e:
-            logger.error(f"Error in bulk adding document chunks: {str(e)}")
-            raise
-
-    async def delete_document_chunk(self, doc_id: str):
-        """Delete a document chunk from the vector database."""
-        try:
-            await self.qdrant_client.delete(
-                collection_name=self.collection_name,
-                points_selector=models.PointIdsList(
-                    points=[doc_id]
-                )
-            )
-            logger.info(f"Deleted document chunk from Qdrant with ID: {doc_id}")
-        except Exception as e:
-            logger.error(f"Error deleting document chunk: {str(e)}")
-            raise
-
-    async def search_by_content(self, text: str, top_k: int = 5) -> List[Dict[str, Any]]:
-        """Search for chunks by content similarity."""
-        try:
-            query_embedding = await self.generate_embedding(text)
-
+            # Perform vector search in Qdrant
             search_results = await self.qdrant_client.search(
                 collection_name=self.collection_name,
                 query_vector=query_embedding,
+                query_filter=search_filter,
                 limit=top_k,
-                with_payload=True,
-                with_vectors=False
+                score_threshold=threshold
             )
 
-            results = []
-            for hit in search_results:
-                results.append({
-                    "content": hit.payload.get("content", ""),
-                    "metadata": hit.payload,
-                    "score": hit.score
-                })
+            # Process results
+            relevant_chunks = []
+            for result in search_results:
+                if result.score >= threshold:
+                    chunk = {
+                        'id': result.id,
+                        'content': result.payload.get('content', ''),
+                        'metadata': result.payload.get('metadata', {}),
+                        'score': result.score
+                    }
+                    relevant_chunks.append(chunk)
 
-            return results
+            logger.info(f"Found {len(relevant_chunks)} relevant chunks for query: {query[:50]}...")
+            return relevant_chunks
+
         except Exception as e:
-            logger.error(f"Error searching by content: {str(e)}")
-            raise
-
-    async def get_document_metadata(self, doc_id: str) -> Optional[Dict[str, Any]]:
-        """Get metadata for a specific document."""
-        try:
-            records = await self.qdrant_client.retrieve(
-                collection_name=self.collection_name,
-                ids=[doc_id],
-                with_payload=True,
-                with_vectors=False
-            )
-
-            if records:
-                return records[0].payload
-            return None
-        except Exception as e:
-            logger.error(f"Error retrieving document metadata: {str(e)}")
-            raise
-
-    async def get_all_sections(self) -> List[str]:
-        """Get all unique sections in the collection."""
-        try:
-            # Get all points and extract unique sections
-            scroll_result = await self.qdrant_client.scroll(
-                collection_name=self.collection_name,
-                limit=10000,  # Adjust based on expected number of documents
-                with_payload=True,
-                with_vectors=False
-            )
-
-            sections = set()
-            for record in scroll_result[0]:  # scroll returns (records, next_page_offset)
-                section = record.payload.get("section", "")
-                if section:
-                    sections.add(section)
-
-            return list(sections)
-        except Exception as e:
-            logger.error(f"Error retrieving sections: {str(e)}")
-            raise
+            logger.error(f"Error retrieving relevant chunks: {e}")
+            # Return empty list if Qdrant is not available, rather than raising an exception
+            logger.warning("Qdrant not available - returning empty results for search")
+            return []
 
     async def get_chunk_count(self) -> int:
-        """Get the total number of chunks in the collection."""
+        """
+        Get the total number of chunks in the collection.
+
+        Returns:
+            Total number of chunks stored
+        """
         try:
-            collection_info = await self.qdrant_client.get_collection(
-                collection_name=self.collection_name
-            )
+            collection_info = await self.qdrant_client.get_collection(self.collection_name)
             return collection_info.points_count
         except Exception as e:
-            logger.error(f"Error getting chunk count: {str(e)}")
-            raise
+            logger.error(f"Error getting chunk count: {e}")
+            return 0
 
-    async def clear_collection(self):
-        """Clear all points from the collection (use with caution!)."""
+    async def get_all_sections(self) -> List[str]:
+        """
+        Get all unique sections/chapters from the stored metadata.
+
+        Returns:
+            List of unique section titles
+        """
         try:
-            await self.qdrant_client.delete(
-                collection_name=self.collection_name,
-                points_selector=models.FilterSelector(
-                    filter=models.Filter(
-                        must=[]
+            # This would require a scroll operation to get all unique sections
+            # For now, return an empty list or implement proper aggregation
+            # In a real implementation, you might want to maintain a separate index of sections
+            return []  # Placeholder - implement based on your specific metadata structure
+        except Exception as e:
+            logger.error(f"Error getting all sections: {e}")
+            return []
+
+    async def retrieve_by_metadata(
+        self,
+        metadata_filters: Dict[str, Any],
+        top_k: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Retrieve chunks based on metadata filters.
+
+        Args:
+            metadata_filters: Dictionary of metadata field-value pairs to filter by
+            top_k: Number of results to return
+
+        Returns:
+            List of matching chunks
+        """
+        top_k = top_k or self.default_top_k
+
+        try:
+            # Build filter from metadata
+            conditions = []
+            for key, value in metadata_filters.items():
+                conditions.append(
+                    FieldCondition(
+                        key=f"metadata.{key}",
+                        match=MatchValue(value=value)
                     )
                 )
+
+            search_filter = Filter(must=conditions) if conditions else None
+
+            # Perform search with filter
+            search_results = await self.qdrant_client.search(
+                collection_name=self.collection_name,
+                query_filter=search_filter,
+                limit=top_k
             )
-            logger.info(f"Cleared collection '{self.collection_name}'")
+
+            # Process results
+            chunks = []
+            for result in search_results:
+                chunk = {
+                    'id': result.id,
+                    'content': result.payload.get('content', ''),
+                    'metadata': result.payload.get('metadata', {}),
+                    'score': result.score
+                }
+                chunks.append(chunk)
+
+            return chunks
+
         except Exception as e:
-            logger.error(f"Error clearing collection: {str(e)}")
+            logger.error(f"Error retrieving by metadata: {e}")
             raise
+
+    async def retrieve_by_ids(self, ids: List[str]) -> List[Dict[str, Any]]:
+        """
+        Retrieve specific chunks by their IDs.
+
+        Args:
+            ids: List of chunk IDs to retrieve
+
+        Returns:
+            List of chunks with matching IDs
+        """
+        try:
+            # Retrieve points by ID
+            points = await self.qdrant_client.retrieve(
+                collection_name=self.collection_name,
+                ids=ids,
+                with_payload=True,
+                with_vectors=False
+            )
+
+            # Process results
+            chunks = []
+            for point in points:
+                chunk = {
+                    'id': point.id,
+                    'content': point.payload.get('content', ''),
+                    'metadata': point.payload.get('metadata', {}),
+                }
+                chunks.append(chunk)
+
+            return chunks
+
+        except Exception as e:
+            logger.error(f"Error retrieving by IDs: {e}")
+            raise
+
+    async def semantic_search(
+        self,
+        query: str,
+        top_k: Optional[int] = None,
+        threshold: Optional[float] = None,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Perform semantic search with optional filters.
+
+        Args:
+            query: Search query text
+            top_k: Number of results to return
+            threshold: Minimum similarity threshold
+            filters: Optional metadata filters
+
+        Returns:
+            List of semantically similar chunks
+        """
+        top_k = top_k or self.default_top_k
+        threshold = threshold or self.search_threshold
+
+        try:
+            # Create embedding for the query
+            query_embedding = await self.create_embedding(query)
+
+            # Build filter if provided
+            search_filter = None
+            if filters:
+                conditions = []
+                for key, value in filters.items():
+                    conditions.append(
+                        FieldCondition(
+                            key=f"metadata.{key}",
+                            match=MatchValue(value=value)
+                        )
+                    )
+                search_filter = Filter(must=conditions) if conditions else None
+
+            # Perform semantic search
+            search_results = await self.qdrant_client.search(
+                collection_name=self.collection_name,
+                query_vector=query_embedding,
+                query_filter=search_filter,
+                limit=top_k,
+                score_threshold=threshold
+            )
+
+            # Process results
+            chunks = []
+            for result in search_results:
+                if result.score >= threshold:
+                    chunk = {
+                        'id': result.id,
+                        'content': result.payload.get('content', ''),
+                        'metadata': result.payload.get('metadata', {}),
+                        'score': result.score
+                    }
+                    chunks.append(chunk)
+
+            return chunks
+
+        except Exception as e:
+            logger.error(f"Error in semantic search: {e}")
+            raise
+
+    async def get_collection_stats(self) -> Dict[str, Any]:
+        """
+        Get statistics about the collection.
+
+        Returns:
+            Dictionary with collection statistics
+        """
+        try:
+            collection_info = await self.qdrant_client.get_collection(self.collection_name)
+            return {
+                'collection_name': self.collection_name,
+                'vector_size': collection_info.config.params.vectors.size,
+                'distance_type': collection_info.config.params.vectors.distance,
+                'total_points': collection_info.points_count,
+                'indexed_vectors_count': collection_info.indexed_vectors_count,
+                'full_scan_threshold': collection_info.config.params.optimizers_config.full_scan_threshold
+            }
+        except Exception as e:
+            logger.error(f"Error getting collection stats: {e}")
+            return {}
+
+    async def delete_chunks_by_metadata(self, metadata_filters: Dict[str, Any]) -> int:
+        """
+        Delete chunks that match metadata filters.
+
+        Args:
+            metadata_filters: Dictionary of metadata field-value pairs to match for deletion
+
+        Returns:
+            Number of deleted chunks
+        """
+        try:
+            # First, find the IDs of points to delete
+            conditions = []
+            for key, value in metadata_filters.items():
+                conditions.append(
+                    FieldCondition(
+                        key=f"metadata.{key}",
+                        match=MatchValue(value=value)
+                    )
+                )
+
+            search_filter = Filter(must=conditions) if conditions else None
+
+            # Get points that match the filter
+            points = await self.qdrant_client.scroll(
+                collection_name=self.collection_name,
+                scroll_filter=search_filter,
+                limit=10000  # Limit to avoid memory issues
+            )
+
+            # Extract IDs
+            ids_to_delete = [point.id for point in points[0]]
+
+            if ids_to_delete:
+                # Delete the points
+                await self.qdrant_client.delete(
+                    collection_name=self.collection_name,
+                    points_selector=models.PointIdsList(
+                        points=ids_to_delete
+                    )
+                )
+
+            logger.info(f"Deleted {len(ids_to_delete)} chunks matching filters")
+            return len(ids_to_delete)
+
+        except Exception as e:
+            logger.error(f"Error deleting chunks by metadata: {e}")
+            raise
+
+
+# Additional utility functions
+async def create_retriever(openai_client: OpenAI) -> RAGRetriever:
+    """Create and initialize a RAG retriever instance."""
+    retriever = RAGRetriever(openai_client)
+    await retriever.initialize_collection()
+    return retriever
+
+
+async def get_relevant_chunks(
+    query: str,
+    openai_client: OpenAI,
+    book_section: Optional[str] = None,
+    top_k: int = 5
+) -> List[Dict[str, Any]]:
+    """Get relevant chunks for a query using a temporary retriever."""
+    retriever = await create_retriever(openai_client)
+    return await retriever.retrieve_relevant_chunks(query, book_section, top_k)
+
+
+if __name__ == "__main__":
+    # Example usage (this would typically be called from the main API)
+    print("RAG Retriever module loaded. Use RAGRetriever class for vector search operations.")

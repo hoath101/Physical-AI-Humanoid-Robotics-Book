@@ -112,9 +112,9 @@ This repository includes a Retrieval-Augmented Generation (RAG) chatbot that all
 
 - OpenAI GPT models for natural language understanding
 - Vector embeddings for semantic search through book content
-- FastAPI backend for processing queries
+- Python FastAPI backend with advanced RAG capabilities
 - Qdrant Cloud for vector storage and retrieval
-- Docusaurus integration for seamless user experience
+- Docusaurus integration with floating chat widget for seamless user experience
 
 The RAG chatbot enables students to:
 - Ask questions about specific modules and concepts
