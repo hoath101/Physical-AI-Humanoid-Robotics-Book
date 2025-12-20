@@ -6,17 +6,18 @@ Handles the processing of book content into vector embeddings for retrieval.
 import os
 import asyncio
 import hashlib
+import re
 from typing import List, Dict, Any, Optional, Callable
 from pathlib import Path
 from datetime import datetime
 import PyPDF2
 import docx
 import json
-from openai import OpenAI
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 import logging
 from config.ingestion_config import get_config_value
+from services.ai_client import AIClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,11 +30,26 @@ class BookIngestionPipeline:
     Supports multiple file formats and chunking strategies.
     """
 
-    def __init__(self, openai_client: OpenAI, qdrant_client: QdrantClient = None):
-        self.openai_client = openai_client
-        self.qdrant_client = qdrant_client or QdrantClient(
-            url=get_config_value('QDRANT_URL', 'http://localhost:6333')
-        )
+    def __init__(self, ai_client: AIClient, qdrant_client: QdrantClient = None):
+        self.ai_client = ai_client
+
+        # Get Qdrant configuration
+        qdrant_url = get_config_value('QDRANT_URL', 'http://localhost:6333')
+        qdrant_api_key = get_config_value('QDRANT_API_KEY', None)
+
+        if qdrant_client is None:
+            # Initialize Qdrant client with API key if provided and not using localhost
+            # Avoid using API key with localhost to prevent "unsecure connection" warning
+            if qdrant_api_key and not qdrant_url.startswith("http://localhost"):
+                self.qdrant_client = QdrantClient(
+                    url=qdrant_url,
+                    api_key=qdrant_api_key
+                )
+            else:
+                self.qdrant_client = QdrantClient(url=qdrant_url)
+        else:
+            self.qdrant_client = qdrant_client
+
         self.collection_name = get_config_value('QDRANT_COLLECTION_NAME', 'book_chunks')
         self.embedding_model = get_config_value('EMBEDDING_MODEL', 'text-embedding-3-small')
         self.max_chunk_size = int(get_config_value('MAX_CHUNK_SIZE', '1000'))
@@ -42,25 +58,33 @@ class BookIngestionPipeline:
     async def initialize_collection(self):
         """Initialize the Qdrant collection for storing book chunks."""
         try:
-            # Check if collection exists
-            collections = await self.qdrant_client.get_collections()
+            # Check if collection exists - Qdrant client methods are synchronous
+            collections = self.qdrant_client.get_collections()
             collection_names = [col.name for col in collections.collections]
+
+            # Determine vector size based on AI provider
+            vector_size = 1536  # Default for OpenAI
+            if hasattr(self.ai_client, 'provider') and self.ai_client.provider == "gemini":
+                vector_size = 768  # Gemini text-embedding-004
 
             if self.collection_name not in collection_names:
                 # Create collection with appropriate vector size
-                await self.qdrant_client.create_collection(
+                self.qdrant_client.create_collection(
                     collection_name=self.collection_name,
                     vectors_config=models.VectorParams(
-                        size=1536,  # Default size for text-embedding-3-small
+                        size=vector_size,
                         distance=models.Distance.COSINE
                     )
                 )
-                logger.info(f"Created Qdrant collection: {self.collection_name}")
+                logger.info(f"Created Qdrant collection: {self.collection_name} with vector size: {vector_size}")
             else:
                 logger.info(f"Qdrant collection {self.collection_name} already exists")
 
         except Exception as e:
             logger.error(f"Error initializing Qdrant collection: {e}")
+            logger.warning("Qdrant not available - ingestion will be skipped")
+            # Re-raise the exception to maintain the original behavior
+            # The calling function (run_ingestion_pipeline) will handle it appropriately
             raise
 
     def extract_text_from_pdf(self, pdf_path: str) -> str:
@@ -123,6 +147,47 @@ class BookIngestionPipeline:
             logger.error(f"Error extracting text from JSON {json_path}: {e}")
             raise
 
+    def extract_text_from_md(self, md_path: str) -> str:
+        """Extract text content from a Markdown file, removing headers and formatting."""
+        try:
+            with open(md_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+
+                # Remove frontmatter if present (content between --- delimiters at the start)
+                if content.startswith('---'):
+                    frontmatter_end = content.find('---', 3)  # Find closing ---
+                    if frontmatter_end != -1:
+                        content = content[frontmatter_end + 3:].strip()
+
+                # Remove markdown formatting while preserving the text content
+                # Remove headers (# Header)
+                content = re.sub(r'^#+\s+', '', content, flags=re.MULTILINE)
+                # Remove bold and italic formatting
+                content = re.sub(r'\*\*(.*?)\*\*', r'\1', content)
+                content = re.sub(r'\*(.*?)\*', r'\1', content)
+                content = re.sub(r'__(.*?)__', r'\1', content)
+                content = re.sub(r'_(.*?)_', r'\1', content)
+                # Remove inline code
+                content = re.sub(r'`(.*?)`', r'\1', content)
+                # Remove links [text](url) -> text
+                content = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', content)
+                # Remove images ![alt](url) -> alt
+                content = re.sub(r'!\[([^\]]*)\]\([^)]+\)', r'\1', content)
+                # Remove blockquotes
+                content = re.sub(r'^>\s+', '', content, flags=re.MULTILINE)
+                # Remove list markers
+                content = re.sub(r'^\s*[-*+]\s+', '', content, flags=re.MULTILINE)
+                content = re.sub(r'^\s*\d+\.\s+', '', content, flags=re.MULTILINE)
+
+                # Clean up extra whitespace
+                content = re.sub(r'\n\s*\n', '\n\n', content)  # Normalize multiple newlines
+                content = content.strip()
+
+                return content
+        except Exception as e:
+            logger.error(f"Error extracting text from Markdown {md_path}: {e}")
+            raise
+
     def split_text(self, text: str, max_chunk_size: int, overlap: int) -> List[Dict[str, Any]]:
         """
         Split text into overlapping chunks with metadata.
@@ -141,21 +206,11 @@ class BookIngestionPipeline:
         chunks = []
         start = 0
         chunk_id = 0
+        text_len = len(text)
 
-        while start < len(text):
-            # Determine the end position
-            end = start + max_chunk_size
-
-            # If we're near the end, include the rest
-            if end >= len(text):
-                end = len(text)
-            else:
-                # Try to break at sentence boundary
-                while end > start + max_chunk_size // 2 and end < len(text) and text[end] not in '.!?':
-                    end += 1
-                # If we couldn't find a good break point, just use max_chunk_size
-                if end <= start + max_chunk_size // 2:
-                    end = start + max_chunk_size
+        while start < text_len:
+            # Calculate end position (simple, no fancy boundary detection)
+            end = min(start + max_chunk_size, text_len)
 
             # Extract the chunk
             chunk_text = text[start:end].strip()
@@ -167,14 +222,21 @@ class BookIngestionPipeline:
                         'start_pos': start,
                         'end_pos': end,
                         'chunk_id': chunk_id,
-                        'total_length': len(text)
+                        'total_length': text_len
                     }
                 }
                 chunks.append(chunk)
                 chunk_id += 1
 
             # Move start position with overlap
-            start = end - overlap if overlap < end else end
+            if overlap > 0 and overlap < end:
+                start = end - overlap
+            else:
+                start = end
+
+            # Safety: prevent infinite loop
+            if end == text_len:
+                break
 
         return chunks
 
@@ -239,7 +301,7 @@ class BookIngestionPipeline:
 
     async def create_embeddings(self, texts: List[str]) -> List[List[float]]:
         """
-        Create embeddings for a list of texts using OpenAI API.
+        Create embeddings for a list of texts using AI client.
 
         Args:
             texts: List of texts to embed
@@ -248,11 +310,13 @@ class BookIngestionPipeline:
             List of embedding vectors
         """
         try:
-            response = self.openai_client.embeddings.create(
-                model=self.embedding_model,
-                input=texts
-            )
-            embeddings = [item.embedding for item in response.data]
+            total = len(texts)
+            logger.info(f"Creating {total} embeddings in batch (parallel processing)...")
+
+            # Use batch processing for much faster embedding creation
+            embeddings = await self.ai_client.create_embeddings_batch(texts)
+
+            logger.info(f"Successfully created {total} embeddings")
             return embeddings
         except Exception as e:
             logger.error(f"Error creating embeddings: {e}")
@@ -271,6 +335,7 @@ class BookIngestionPipeline:
         logger.info(f"Processing file: {file_path}")
 
         # Extract text based on file extension
+        logger.info(f"Step 1: Extracting text from file...")
         file_ext = Path(file_path).suffix.lower()
         if file_ext == '.pdf':
             content = self.extract_text_from_pdf(file_path)
@@ -280,17 +345,22 @@ class BookIngestionPipeline:
             content = self.extract_text_from_txt(file_path)
         elif file_ext == '.json':
             content = self.extract_text_from_json(file_path)
+        elif file_ext == '.md':
+            content = self.extract_text_from_md(file_path)
         else:
             raise ValueError(f"Unsupported file format: {file_ext}")
 
+        logger.info(f"Step 2: Text extracted ({len(content)} chars). Splitting into chunks...")
         # Split content into chunks
         chunks = self.split_text(content, self.max_chunk_size, self.overlap)
+        logger.info(f"Step 3: Created {len(chunks)} chunks. Adding metadata...")
 
         # Add metadata to each chunk
         for chunk in chunks:
             chunk['metadata'].update(self.extract_metadata_from_content(content, file_path))
             chunk['metadata']['source_file'] = str(file_path)
 
+        logger.info(f"Step 4: Metadata added. Creating embeddings...")
         # Create embeddings for all chunks
         if chunks:
             texts = [chunk['content'] for chunk in chunks]
@@ -314,19 +384,24 @@ class BookIngestionPipeline:
             return
 
         points = []
-        for chunk in chunks:
+        for idx, chunk in enumerate(chunks):
+            # Generate unique ID from source file and chunk id
+            unique_string = f"{chunk['metadata'].get('source_file', 'unknown')}_{chunk['metadata'].get('chunk_id', idx)}"
+            chunk_id = hashlib.md5(unique_string.encode()).hexdigest()
+
             point = models.PointStruct(
-                id=hashlib.md5(f"{chunk['metadata']['source_file']}_{chunk['metadata']['chunk_id']}".encode()).hexdigest(),
+                id=chunk_id,
                 vector=chunk['embedding'],
                 payload={
+                    'id': chunk_id,  # Also store in payload for easier retrieval
                     'content': chunk['content'],
                     'metadata': chunk['metadata']
                 }
             )
             points.append(point)
 
-        # Upload points to Qdrant
-        await self.qdrant_client.upsert(
+        # Upload points to Qdrant - synchronous call
+        self.qdrant_client.upsert(
             collection_name=self.collection_name,
             points=points
         )
@@ -348,7 +423,7 @@ class BookIngestionPipeline:
             raise ValueError(f"Directory does not exist: {directory_path}")
 
         # Supported file extensions
-        supported_extensions = {'.pdf', '.docx', '.txt', '.json'}
+        supported_extensions = {'.pdf', '.docx', '.txt', '.json', '.md'}
 
         files_to_process = []
         for ext in supported_extensions:
@@ -357,13 +432,19 @@ class BookIngestionPipeline:
 
         total_chunks = 0
         processed_files = 0
+        total_files = len(files_to_process)
 
-        for file_path in files_to_process:
+        logger.info(f"Found {total_files} files to process")
+
+        for idx, file_path in enumerate(files_to_process, 1):
             try:
+                logger.info(f"Processing file {idx}/{total_files}: {file_path.name}")
                 chunks = await self.process_file(str(file_path))
                 if chunks:
+                    logger.info(f"  -> Generated {len(chunks)} chunks, storing in Qdrant...")
                     await self.store_chunks_in_qdrant(chunks)
                     total_chunks += len(chunks)
+                    logger.info(f"  -> Stored successfully!")
                     processed_files += 1
                     logger.info(f"Successfully processed {file_path} ({len(chunks)} chunks)")
             except Exception as e:
@@ -376,7 +457,7 @@ class BookIngestionPipeline:
 
 async def run_ingestion_pipeline(
     book_directory: str,
-    openai_client: OpenAI,
+    ai_client: AIClient,
     max_chunk_size: int = 1000,
     overlap: int = 100
 ):
@@ -397,7 +478,7 @@ async def run_ingestion_pipeline(
     config_module._config_values['CHUNK_OVERLAP'] = str(overlap)
 
     # Create ingestion pipeline instance
-    pipeline = BookIngestionPipeline(openai_client)
+    pipeline = BookIngestionPipeline(ai_client)
 
     try:
         # Initialize Qdrant collection
@@ -411,13 +492,20 @@ async def run_ingestion_pipeline(
 
     except Exception as e:
         logger.error(f"Error in ingestion pipeline: {e}")
-        raise
+        # Check if this is a Qdrant connection error
+        error_msg = str(e).lower()
+        if "connection" in error_msg or "refused" in error_msg or "timeout" in error_msg:
+            logger.warning("Qdrant is not available. Ingestion skipped. Please start Qdrant server to enable document ingestion.")
+            return 0  # Return 0 to indicate no files were processed due to Qdrant unavailability
+        else:
+            # Re-raise other types of errors
+            raise
 
 
 # Additional utility functions
 async def reinitialize_collection(collection_name: Optional[str] = None):
     """Reinitialize the Qdrant collection (useful for clearing/restarting)."""
-    pipeline = BookIngestionPipeline(OpenAI())  # Dummy client for initialization only
+    pipeline = BookIngestionPipeline(AsyncOpenAI())  # Dummy client for initialization only
     if collection_name:
         pipeline.collection_name = collection_name
     await pipeline.initialize_collection()
@@ -425,13 +513,13 @@ async def reinitialize_collection(collection_name: Optional[str] = None):
 
 def get_supported_file_types() -> List[str]:
     """Get list of supported file types for ingestion."""
-    return ['.pdf', '.docx', '.txt', '.json']
+    return ['.pdf', '.docx', '.txt', '.json', '.md']
 
 
 if __name__ == "__main__":
     # Example usage (this would typically be called from the main API)
     import os
-    from openai import OpenAI
+    from openai import AsyncOpenAI
     from datetime import datetime
 
     # This is just for testing - in production this would be called from main.py

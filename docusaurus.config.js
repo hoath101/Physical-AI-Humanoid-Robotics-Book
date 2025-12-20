@@ -54,6 +54,8 @@ const config = {
         enabled: true,
         title: 'Book Assistant',
         initialOpen: false,
+        apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:8000',
+        bookId: process.env.DEFAULT_BOOK_ID || 'default-book',
         // Sensitive configuration like client tokens should be handled on the backend
       },
       // Replace with your project's social card
@@ -119,9 +121,6 @@ const config = {
         theme: require('prism-react-renderer').themes.github,
       },
     }),
-    clientModules: [
-      require.resolve('./src/components/Root.js'),
-     ],
 };
 
 module.exports = config;

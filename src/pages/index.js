@@ -1,6 +1,5 @@
 import Layout from "@theme/Layout";
 import Link from "@docusaurus/Link";
-import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function Home() {
   return (
@@ -21,8 +20,8 @@ export default function Home() {
         </h1>
 
         <p style={{ fontSize: "1.3rem", lineHeight: "1.6", marginBottom: "2rem" }}>
-          Explore how artificial intelligence integrates with physical robotic 
-          bodies—unlocking movement, perception, learning, and autonomy.  
+          Explore how artificial intelligence integrates with physical robotic
+          bodies—unlocking movement, perception, learning, and autonomy.
           This book bridges theory with real-world robotics and the future of humanoid machines.
         </p>
 
@@ -32,7 +31,6 @@ export default function Home() {
         >
           📘 Start Reading
         </Link>
-        <ChatbotWidget/>
       </main>
     </Layout>
   );

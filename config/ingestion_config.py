@@ -50,11 +50,12 @@ def get_config_value(key: str, default_value: Optional[Union[str, int, float, bo
 
     # Fourth, check for module-defined defaults
     module_defaults = {
-        # Database configuration
-        'DATABASE_URL': 'postgresql://user:password@localhost:5432/book_rag_chatbot',
+        # Database configuration (optional - system works without database)
+        'DATABASE_URL': 'postgresql://user:password@localhost:5432/book_rag_chatbot',  # Optional: for question logging
 
         # Qdrant vector database configuration
-        'QDRANT_URL': 'http://localhost:6333',
+        'QDRANT_URL': 'http://localhost:6333',  # Default to local; override with env var for cloud
+        'QDRANT_API_KEY': None,  # Add support for API key
         'QDRANT_COLLECTION_NAME': 'book_chunks',
 
         # OpenAI configuration

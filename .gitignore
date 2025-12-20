@@ -18,6 +18,14 @@ out/
 *.a
 *.exe
 *.dll
+.env
+
+# Unnecessary Md files
+DEPLOYMENT_GUIDE.md
+DEPLOYMENT_CHECKLIST.md
+HF_DEPLOYMENT_GUIDE.md
+README_HF.md
+SETUP_GUIDE.md
 
 # LaTeX
 *.aux
@@ -63,6 +71,7 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+.env.production
 node_modules/
 dist/
 .docusaurus/

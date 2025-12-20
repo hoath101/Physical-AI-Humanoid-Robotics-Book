@@ -29,15 +29,23 @@ class CacheService:
 
     async def initialize(self):
         """Initialize the cache service, attempting to connect to Redis first."""
+        # Check if Redis is explicitly disabled for production
+        redis_enabled = get_config_value('REDIS_ENABLED', 'false').lower() == 'true'
+
+        if not redis_enabled:
+            print("[CACHE] Using in-memory cache (Redis disabled for serverless deployment)")
+            self.redis_client = None
+            return
+
         try:
             # Try to connect to Redis
             redis_url = get_config_value('REDIS_URL', 'redis://localhost:6379')
             self.redis_client = await redis.from_url(redis_url, decode_responses=True)
             # Test the connection
             await self.redis_client.ping()
-            print("Cache service initialized with Redis backend")
+            print("[CACHE] Service initialized with Redis backend")
         except Exception as e:
-            print(f"Redis connection failed: {e}. Falling back to in-memory cache.")
+            print(f"[CACHE] Redis unavailable, using in-memory cache (this is normal for serverless deployments)")
             self.redis_client = None
 
     async def close(self):

@@ -9,8 +9,8 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 from uuid import uuid4
 
-from openai import OpenAI
 from pydantic import BaseModel
+from services.ai_client import AIClient
 
 from rag.retriever import RAGRetriever
 from db.database import db_manager
@@ -43,8 +43,8 @@ class ChatAdapter:
     Adapter class that provides ChatKit-like interface but uses RAG backend
     """
 
-    def __init__(self, openai_client: OpenAI, rag_retriever: RAGRetriever):
-        self.openai_client = openai_client
+    def __init__(self, ai_client: AIClient, rag_retriever: RAGRetriever):
+        self.ai_client = ai_client
         self.rag_retriever = rag_retriever
         self.logger = logging.getLogger(__name__)
 
@@ -154,15 +154,11 @@ class ChatAdapter:
                     }
                 ]
 
-                response = self.openai_client.chat.completions.create(
-                    model="gpt-4o",
+                response_text = await self.ai_client.create_chat_completion(
                     messages=messages,
                     temperature=0.3,
-                    max_tokens=1000,
-                    timeout=30  # Add timeout to prevent hanging requests
+                    max_tokens=1000
                 )
-
-                response_text = response.choices[0].message.content
 
             # Create AI response message
             ai_message = Message(
@@ -254,8 +250,8 @@ def get_chat_adapter() -> ChatAdapter:
     return chat_adapter
 
 
-async def init_chat_adapter(openai_client: OpenAI, rag_retriever: RAGRetriever):
+async def init_chat_adapter(ai_client: AIClient, rag_retriever: RAGRetriever):
     """Initialize the chat adapter with required dependencies"""
     global chat_adapter
-    chat_adapter = ChatAdapter(openai_client, rag_retriever)
+    chat_adapter = ChatAdapter(ai_client, rag_retriever)
     return chat_adapter

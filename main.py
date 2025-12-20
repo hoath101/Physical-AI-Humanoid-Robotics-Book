@@ -13,10 +13,11 @@ from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from enum import Enum
-from openai import OpenAI
 from dotenv import load_dotenv
 from middleware.auth import authenticate_request, check_rate_limit, security
-from services.cache import cache_service, init_cache, close_cache
+from services.cache import init_cache, close_cache
+import services.cache as cache_module
+from services.ai_client import AIClient
 
 from rag.ingestion import run_ingestion_pipeline, BookIngestionPipeline
 from rag.retriever import RAGRetriever
@@ -54,26 +55,25 @@ class QueryResponse(BaseModel):
 # Load environment variables
 load_dotenv()
 
-# Initialize OpenAI client
-openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
 # Global components
+ai_client: Optional[AIClient] = None
 rag_retriever: Optional[RAGRetriever] = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager to initialize and cleanup resources."""
-    global rag_retriever
+    global ai_client, rag_retriever
 
     print("Starting Physical AI & Humanoid Robotics Book RAG Chatbot...")
 
-    # Initialize components
-    if not openai_client.api_key:
-        raise ValueError("OPENAI_API_KEY environment variable is not set")
+    # Initialize AI client
+    ai_client = AIClient()
+    if not ai_client.api_key:
+        raise ValueError("AI API KEY environment variable is not set")
 
     # Initialize RAG retriever
-    rag_retriever = RAGRetriever(openai_client)
+    rag_retriever = RAGRetriever(ai_client)
 
     # Initialize Qdrant collection
     try:
@@ -84,7 +84,7 @@ async def lifespan(app: FastAPI):
 
     # Initialize chat adapter
     try:
-        await init_chat_adapter(openai_client, rag_retriever)
+        await init_chat_adapter(ai_client, rag_retriever)
         logger.info("Chat adapter initialized successfully")
     except Exception as e:
         logger.error(f"Error initializing chat adapter: {e}")
@@ -142,11 +142,18 @@ async def chat_endpoint(
 
     Supports both global (full book) and selection-only modes.
     """
+    print(f"\n{'='*60}")
+    print(f"[CHAT] Incoming chat request:")
+    print(f"       Question: {request.question[:100]}...")
+    print(f"       Query Mode: {request.query_mode}")
+    print(f"       Book ID: {request.book_id}")
+    print(f"{'='*60}\n")
+
     try:
         from rag.retriever import RAGRetriever
         from db.database import db_manager
 
-        global rag_retriever, openai_client
+        global rag_retriever, ai_client
 
         # Input validation
         if not request.question or len(request.question.strip()) == 0:
@@ -159,7 +166,7 @@ async def chat_endpoint(
             raise HTTPException(status_code=400, detail="Selected text is too long (max 5000 characters)")
 
         # Check cache first for this query
-        cached_response = await cache_service.get_query_response(
+        cached_response = await cache_module.cache_service.get_query_response(
             request.question,
             request.selected_text,
             request.book_id
@@ -178,6 +185,7 @@ async def chat_endpoint(
 
         # Determine which mode to use based on query_mode
         if request.query_mode == QueryMode.SELECTION_ONLY and request.selected_text and request.selected_text.strip():
+            print("[MODE] Using SELECTION_ONLY mode")
             # Selected-text-only mode: Only use provided text
             messages = [
                 {
@@ -197,15 +205,11 @@ async def chat_endpoint(
             ]
 
             try:
-                response = openai_client.chat.completions.create(
-                    model="gpt-4o",
+                answer = await ai_client.create_chat_completion(
                     messages=messages,
                     temperature=request.temperature,
-                    max_tokens=1000,
-                    timeout=30  # Add timeout to prevent hanging requests
+                    max_tokens=1000
                 )
-
-                answer = response.choices[0].message.content
 
                 # Save the interaction to database
                 await db_manager.save_question_answer(
@@ -225,7 +229,7 @@ async def chat_endpoint(
                 )
 
                 # Cache the response for future queries
-                await cache_service.set_query_response(
+                await cache_module.cache_service.set_query_response(
                     request.question,
                     request.selected_text,
                     request.book_id,
@@ -237,20 +241,24 @@ async def chat_endpoint(
                 print(f"Error with OpenAI API in selected-text mode: {str(e)}")
                 raise HTTPException(status_code=500, detail=f"Error generating response: {str(e)}")
         else:
+            print("[MODE] Using GLOBAL mode (RAG with vector search)")
             # Global mode: Use vector search and RAG
             global rag_retriever
 
             try:
+                print(f"[RAG] Retrieving relevant chunks from vector database...")
                 # Retrieve relevant chunks from the book
                 retrieved_chunks = await rag_retriever.retrieve_relevant_chunks(
                     request.question,
                     book_section=None  # We'll search across all sections
                 )
+                print(f"[RAG] Retrieved {len(retrieved_chunks)} relevant chunks")
             except Exception as e:
-                print(f"Error retrieving chunks from Qdrant: {str(e)}")
+                print(f"[ERROR] Error retrieving chunks from Qdrant: {str(e)}")
                 raise HTTPException(status_code=500, detail=f"Error retrieving information from the book: {str(e)}")
 
             if not retrieved_chunks:
+                print("[WARN] No relevant chunks found for the query")
                 # If no relevant chunks found, return appropriate response
                 answer = (
                     "I couldn't find specific information in the book related to your question: "
@@ -275,7 +283,7 @@ async def chat_endpoint(
                 )
 
                 # Cache the response for future queries
-                await cache_service.set_query_response(
+                await cache_module.cache_service.set_query_response(
                     request.question,
                     request.selected_text,
                     request.book_id,
@@ -300,7 +308,7 @@ async def chat_endpoint(
                 }
                 citations.append(citation)
 
-            document_ids = [chunk['metadata']['id'] for chunk in retrieved_chunks]
+            document_ids = [chunk['id'] for chunk in retrieved_chunks]
 
             # Check if the context is too long for the model
             max_context_length = 10000  # Approximate limit for model context
@@ -328,15 +336,13 @@ async def chat_endpoint(
             ]
 
             try:
-                response = openai_client.chat.completions.create(
-                    model="gpt-4o",
+                print(f"[AI] Calling AI API to generate response...")
+                answer = await ai_client.create_chat_completion(
                     messages=messages,
                     temperature=request.temperature,
-                    max_tokens=1000,
-                    timeout=30  # Add timeout to prevent hanging requests
+                    max_tokens=1000
                 )
-
-                answer = response.choices[0].message.content
+                print(f"[AI] Generated response successfully")
 
                 # Save the interaction to database
                 await db_manager.save_question_answer(
@@ -356,7 +362,7 @@ async def chat_endpoint(
                 )
 
                 # Cache the response for future queries
-                await cache_service.set_query_response(
+                await cache_module.cache_service.set_query_response(
                     request.question,
                     request.selected_text,
                     request.book_id,
@@ -410,15 +416,15 @@ async def ingest_books(
         if request.overlap < 0 or request.overlap >= request.max_chunk_size:
             raise HTTPException(status_code=400, detail="overlap must be between 0 and max_chunk_size-1")
 
-        # Check if OpenAI client is initialized
-        if not openai_client.api_key:
-            raise HTTPException(status_code=500, detail="OpenAI client not properly initialized")
+        # Check if AI client is initialized
+        if not ai_client.api_key:
+            raise HTTPException(status_code=500, detail="AI client not properly initialized")
 
-        # Run ingestion in background
+        # Run ingestion in background with error handling
         background_tasks.add_task(
-            run_ingestion_pipeline,
+            safe_run_ingestion_pipeline,
             request.book_directory,
-            openai_client,
+            ai_client,
             request.max_chunk_size,
             request.overlap
         )
@@ -527,6 +533,22 @@ async def test_query_endpoint(
         traceback.print_exc()  # Log the full traceback for debugging
         raise HTTPException(status_code=500, detail=f"Error testing query: {str(e)}")
 
+
+# Root endpoint
+@app.get("/")
+async def root():
+    """Root endpoint - API information"""
+    return {
+        "name": "Physical AI & Humanoid Robotics Book API",
+        "version": "1.0.0",
+        "status": "running",
+        "endpoints": {
+            "health": "/health",
+            "chat": "/chat",
+            "docs": "/docs",
+            "collection_info": "/collection-info"
+        }
+    }
 
 # Health check endpoint
 @app.get("/health")
@@ -759,6 +781,31 @@ async def get_info():
             {"path": "/info", "method": "GET", "description": "System information"}
         ]
     }
+
+
+# Safe wrapper for ingestion pipeline to handle exceptions in background tasks
+async def safe_run_ingestion_pipeline(
+    book_directory: str,
+    ai_client,
+    max_chunk_size: int = 1000,
+    overlap: int = 100
+):
+    """
+    Safe wrapper for the ingestion pipeline that catches exceptions to prevent
+    background task errors from affecting the ASGI application.
+    """
+    try:
+        from rag.ingestion import run_ingestion_pipeline
+        await run_ingestion_pipeline(
+            book_directory=book_directory,
+            ai_client=ai_client,
+            max_chunk_size=max_chunk_size,
+            overlap=overlap
+        )
+    except Exception as e:
+        logger.error(f"Error in background ingestion task: {e}")
+        # Log the error but don't re-raise to prevent ASGI application exceptions
+        # The ingestion will fail gracefully with a warning in the logs
 
 
 if __name__ == "__main__":

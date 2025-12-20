@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize security scheme
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)  # Set auto_error to False to make it optional
 
 class APIKeyManager:
     """
@@ -62,9 +62,14 @@ class APIKeyManager:
         Returns:
             True if the API key is valid, False otherwise
         """
-        if not self.api_keys:
-            # If no keys are configured, allow all requests (development mode)
-            return True
+        # Check if in development mode (no keys configured OR development environment)
+        if not self.api_keys or os.getenv("ENVIRONMENT", "development") == "development":
+            # In development mode, allow valid API keys or allow all requests
+            if not self.api_keys:
+                return True
+            else:
+                # If keys are configured but in development, still check them
+                return api_key in self.api_keys
         return api_key in self.api_keys
 
     def add_api_key(self, api_key: str):
@@ -93,19 +98,41 @@ class APIKeyManager:
 api_key_manager = APIKeyManager()
 
 
-async def authenticate_request(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+async def authenticate_request(request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
     """
     Authenticate the incoming request using API key.
+    In development mode, allows requests without API key from localhost.
 
     Args:
-        credentials: HTTP authorization credentials
+        request: The incoming request (for development mode check)
+        credentials: HTTP authorization credentials (may be None)
 
     Returns:
-        The validated API key
+        The validated API key or a default key in development
 
     Raises:
-        HTTPException: If authentication fails
+        HTTPException: If authentication fails in production
     """
+    # Check if in development mode
+    if os.getenv("ENVIRONMENT", "development") == "development":
+        # In development, allow requests from localhost without API key
+        client_host = request.client.host if request.client else ""
+        if client_host in ["127.0.0.1", "localhost", "::1"]:
+            logger.info("Development mode: Allowing localhost request without API key")
+            # Return the configured API key if available, otherwise a development key
+            if api_key_manager.api_keys:
+                return next(iter(api_key_manager.api_keys))
+            else:
+                return "development-key"
+
+    # Production mode or non-localhost request: require API key
+    if credentials is None or credentials.credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="API key required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     api_key = credentials.credentials
 
     if not api_key_manager.is_valid_api_key(api_key):
@@ -202,6 +229,7 @@ rate_limiter = RateLimitManager()
 async def check_rate_limit(request: Request, credentials: HTTPAuthorizationCredentials = Depends(security)):
     """
     Check if the request is within rate limits.
+    In development mode, allows requests without rate limiting from localhost.
 
     Args:
         request: The incoming request
@@ -210,6 +238,26 @@ async def check_rate_limit(request: Request, credentials: HTTPAuthorizationCrede
     Raises:
         HTTPException: If rate limit is exceeded
     """
+    # Check if in development mode
+    if os.getenv("ENVIRONMENT", "development") == "development":
+        # In development, allow requests from localhost without rate limiting
+        client_host = request.client.host if request.client else ""
+        if client_host in ["127.0.0.1", "localhost", "::1"]:
+            logger.info("Development mode: Skipping rate limit for localhost request")
+            # Return the configured API key if available, otherwise a development key
+            if api_key_manager.api_keys:
+                return next(iter(api_key_manager.api_keys))
+            else:
+                return "development-key"
+
+    # Production mode: require credentials and check rate limit
+    if credentials is None or credentials.credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="API key required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     api_key = credentials.credentials
 
     if not rate_limiter.is_allowed(api_key):

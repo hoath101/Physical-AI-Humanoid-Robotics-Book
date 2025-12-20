@@ -1,4 +1,3 @@
-# Use Python 3.11 slim image
 FROM python:3.11-slim
 
 # Set working directory
@@ -6,22 +5,31 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first to leverage Docker cache
-COPY pyproject.toml .
+# Copy requirements first for better caching
+COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir ".[dev]"
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY . .
+COPY config/ ./config/
+COPY db/ ./db/
+COPY middleware/ ./middleware/
+COPY rag/ ./rag/
+COPY services/ ./services/
+COPY main.py .
+COPY app.py .
 
-# Expose port
-EXPOSE 8000
+# Expose port 7860 (Hugging Face Spaces default)
+EXPOSE 7860
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:7860/health')"
 
 # Run the application
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "app.py"]

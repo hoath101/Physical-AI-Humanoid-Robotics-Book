@@ -1,0 +1,61 @@
+# Spaces ignore file - files/folders to exclude from Hugging Face Spaces
+
+# Node.js / Frontend files (not needed for backend)
+node_modules/
+package.json
+package-lock.json
+docusaurus.config.js
+sidebars.js
+babel.config.js
+docs/
+static/
+src/pages/
+src/css/
+src/theme/
+build/
+.docusaurus/
+
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Environment files (secrets go in HF Spaces settings)
+.env
+.env.local
+.env.production
+
+# Scripts not needed in production
+ingest_docs.py
+ingest_docs_simple.py
+ingest_all_modules.py
+check_collection.py
+reset_collection.py
+test_md_extraction.py
+
+# Deployment guides
+DEPLOYMENT_GUIDE.md
+DEPLOYMENT_CHECKLIST.md
+SETUP_GUIDE.md
+
+# Docker files (HF uses its own containerization)
+Dockerfile
+docker-compose.yml
+
+# Other
+*.log
+__pycache__/
+*.pyc
+.pytest_cache/

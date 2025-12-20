@@ -6,11 +6,11 @@ Handles vector search and document retrieval for question answering.
 import asyncio
 import logging
 from typing import List, Dict, Any, Optional
-from openai import OpenAI
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from qdrant_client.http.models import Filter, FieldCondition, MatchValue
 from config.ingestion_config import get_config_value
+from services.ai_client import AIClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,11 +23,23 @@ class RAGRetriever:
     to find relevant book content for answering user questions.
     """
 
-    def __init__(self, openai_client: OpenAI):
-        self.openai_client = openai_client
-        self.qdrant_client = QdrantClient(
-            url=get_config_value('QDRANT_URL', 'http://localhost:6333')
-        )
+    def __init__(self, ai_client: AIClient):
+        self.ai_client = ai_client
+
+        # Get Qdrant configuration
+        qdrant_url = get_config_value('QDRANT_URL', 'http://localhost:6333')
+        qdrant_api_key = get_config_value('QDRANT_API_KEY', None)
+
+        # Initialize Qdrant client with API key if provided and not using localhost
+        # Avoid using API key with localhost to prevent "unsecure connection" warning
+        if qdrant_api_key and not qdrant_url.startswith("http://localhost"):
+            self.qdrant_client = QdrantClient(
+                url=qdrant_url,
+                api_key=qdrant_api_key
+            )
+        else:
+            self.qdrant_client = QdrantClient(url=qdrant_url)
+
         self.collection_name = get_config_value('QDRANT_COLLECTION_NAME', 'book_chunks')
         self.embedding_model = get_config_value('EMBEDDING_MODEL', 'text-embedding-3-small')
         self.default_top_k = int(get_config_value('DEFAULT_TOP_K', '5'))
@@ -36,20 +48,25 @@ class RAGRetriever:
     async def initialize_collection(self):
         """Initialize the Qdrant collection if it doesn't exist."""
         try:
-            # Check if collection exists
-            collections = await self.qdrant_client.get_collections()
+            # Check if collection exists - Qdrant client methods are synchronous, not async
+            collections = self.qdrant_client.get_collections()
             collection_names = [col.name for col in collections.collections]
+
+            # Determine vector size based on AI provider
+            vector_size = 1536  # Default for OpenAI text-embedding-3-small
+            if self.ai_client.provider == "gemini":
+                vector_size = 768  # Gemini text-embedding-004 uses 768 dimensions
 
             if self.collection_name not in collection_names:
                 # Create collection with appropriate vector size
-                await self.qdrant_client.create_collection(
+                self.qdrant_client.create_collection(
                     collection_name=self.collection_name,
                     vectors_config=models.VectorParams(
-                        size=1536,  # Default size for text-embedding-3-small
+                        size=vector_size,
                         distance=models.Distance.COSINE
                     )
                 )
-                logger.info(f"Created Qdrant collection: {self.collection_name}")
+                logger.info(f"Created Qdrant collection: {self.collection_name} with vector size: {vector_size}")
             else:
                 logger.info(f"Qdrant collection {self.collection_name} already exists")
 
@@ -70,11 +87,8 @@ class RAGRetriever:
             Embedding vector as a list of floats
         """
         try:
-            response = self.openai_client.embeddings.create(
-                model=self.embedding_model,
-                input=text
-            )
-            return response.data[0].embedding
+            embedding = await self.ai_client.create_embedding(text)
+            return embedding
         except Exception as e:
             logger.error(f"Error creating embedding: {e}")
             raise
@@ -120,8 +134,8 @@ class RAGRetriever:
                     ]
                 )
 
-            # Perform vector search in Qdrant
-            search_results = await self.qdrant_client.search(
+            # Perform vector search in Qdrant - synchronous call
+            search_results = self.qdrant_client.search(
                 collection_name=self.collection_name,
                 query_vector=query_embedding,
                 query_filter=search_filter,
@@ -134,7 +148,7 @@ class RAGRetriever:
             for result in search_results:
                 if result.score >= threshold:
                     chunk = {
-                        'id': result.id,
+                        'id': result.payload.get('id', str(result.id)),  # Use payload ID or convert result.id to string
                         'content': result.payload.get('content', ''),
                         'metadata': result.payload.get('metadata', {}),
                         'score': result.score
@@ -158,7 +172,7 @@ class RAGRetriever:
             Total number of chunks stored
         """
         try:
-            collection_info = await self.qdrant_client.get_collection(self.collection_name)
+            collection_info = self.qdrant_client.get_collection(self.collection_name)
             return collection_info.points_count
         except Exception as e:
             logger.error(f"Error getting chunk count: {e}")
@@ -210,8 +224,8 @@ class RAGRetriever:
 
             search_filter = Filter(must=conditions) if conditions else None
 
-            # Perform search with filter
-            search_results = await self.qdrant_client.search(
+            # Perform search with filter - synchronous call
+            search_results = self.qdrant_client.search(
                 collection_name=self.collection_name,
                 query_filter=search_filter,
                 limit=top_k
@@ -245,8 +259,8 @@ class RAGRetriever:
             List of chunks with matching IDs
         """
         try:
-            # Retrieve points by ID
-            points = await self.qdrant_client.retrieve(
+            # Retrieve points by ID - synchronous call
+            points = self.qdrant_client.retrieve(
                 collection_name=self.collection_name,
                 ids=ids,
                 with_payload=True,
@@ -308,8 +322,8 @@ class RAGRetriever:
                     )
                 search_filter = Filter(must=conditions) if conditions else None
 
-            # Perform semantic search
-            search_results = await self.qdrant_client.search(
+            # Perform semantic search - synchronous call
+            search_results = self.qdrant_client.search(
                 collection_name=self.collection_name,
                 query_vector=query_embedding,
                 query_filter=search_filter,
@@ -343,7 +357,7 @@ class RAGRetriever:
             Dictionary with collection statistics
         """
         try:
-            collection_info = await self.qdrant_client.get_collection(self.collection_name)
+            collection_info = self.qdrant_client.get_collection(self.collection_name)
             return {
                 'collection_name': self.collection_name,
                 'vector_size': collection_info.config.params.vectors.size,
@@ -379,8 +393,8 @@ class RAGRetriever:
 
             search_filter = Filter(must=conditions) if conditions else None
 
-            # Get points that match the filter
-            points = await self.qdrant_client.scroll(
+            # Get points that match the filter - synchronous call
+            points = self.qdrant_client.scroll(
                 collection_name=self.collection_name,
                 scroll_filter=search_filter,
                 limit=10000  # Limit to avoid memory issues
@@ -390,8 +404,8 @@ class RAGRetriever:
             ids_to_delete = [point.id for point in points[0]]
 
             if ids_to_delete:
-                # Delete the points
-                await self.qdrant_client.delete(
+                # Delete the points - synchronous call
+                self.qdrant_client.delete(
                     collection_name=self.collection_name,
                     points_selector=models.PointIdsList(
                         points=ids_to_delete
@@ -407,21 +421,21 @@ class RAGRetriever:
 
 
 # Additional utility functions
-async def create_retriever(openai_client: OpenAI) -> RAGRetriever:
+async def create_retriever(ai_client: AIClient) -> RAGRetriever:
     """Create and initialize a RAG retriever instance."""
-    retriever = RAGRetriever(openai_client)
+    retriever = RAGRetriever(ai_client)
     await retriever.initialize_collection()
     return retriever
 
 
 async def get_relevant_chunks(
     query: str,
-    openai_client: OpenAI,
+    ai_client: AIClient,
     book_section: Optional[str] = None,
     top_k: int = 5
 ) -> List[Dict[str, Any]]:
     """Get relevant chunks for a query using a temporary retriever."""
-    retriever = await create_retriever(openai_client)
+    retriever = await create_retriever(ai_client)
     return await retriever.retrieve_relevant_chunks(query, book_section, top_k)
 
 

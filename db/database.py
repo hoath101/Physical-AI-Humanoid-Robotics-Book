@@ -56,6 +56,11 @@ class DatabaseManager:
 
     async def _create_tables(self):
         """Create required database tables if they don't exist."""
+        # If pool is not available (connection failed), return early gracefully
+        if not self.pool:
+            logger.warning("Database pool not available, skipping table creation")
+            return
+
         async with self.pool.acquire() as conn:
             # Create questions_answers table
             await conn.execute("""
@@ -148,6 +153,11 @@ class DatabaseManager:
         Returns:
             ID of the inserted record
         """
+        # If pool is not available (connection failed), return early gracefully
+        if not self.pool:
+            logger.warning("Database pool not available, skipping save_question_answer")
+            return 0  # Return a dummy ID to indicate the operation was skipped
+
         try:
             async with self.pool.acquire() as conn:
                 query = """
@@ -168,7 +178,8 @@ class DatabaseManager:
                 return result
         except Exception as e:
             logger.error(f"Error saving question-answer pair: {e}")
-            raise
+            # Don't raise the exception to avoid breaking the main flow when database is unavailable
+            return 0  # Return a dummy ID to indicate failure
 
     async def get_question_answer(self, qa_id: int) -> Optional[Dict[str, Any]]:
         """
@@ -180,6 +191,11 @@ class DatabaseManager:
         Returns:
             Dictionary with question-answer data or None if not found
         """
+        # If pool is not available (connection failed), return None gracefully
+        if not self.pool:
+            logger.warning("Database pool not available, skipping get_question_answer")
+            return None
+
         try:
             async with self.pool.acquire() as conn:
                 query = """
@@ -201,7 +217,7 @@ class DatabaseManager:
                 return None
         except Exception as e:
             logger.error(f"Error retrieving question-answer pair: {e}")
-            raise
+            return None  # Return None instead of raising to not break the main flow
 
     async def get_recent_questions_answers(
         self,
@@ -218,6 +234,11 @@ class DatabaseManager:
         Returns:
             List of question-answer dictionaries
         """
+        # If pool is not available (connection failed), return empty list gracefully
+        if not self.pool:
+            logger.warning("Database pool not available, returning empty list for get_recent_questions_answers")
+            return []
+
         try:
             async with self.pool.acquire() as conn:
                 query = """
@@ -241,7 +262,7 @@ class DatabaseManager:
                 ]
         except Exception as e:
             logger.error(f"Error retrieving recent question-answer pairs: {e}")
-            raise
+            return []  # Return empty list instead of raising to not break the main flow
 
     async def save_user_interaction(
         self,
@@ -264,6 +285,11 @@ class DatabaseManager:
         Returns:
             ID of the inserted record
         """
+        # If pool is not available (connection failed), return early gracefully
+        if not self.pool:
+            logger.warning("Database pool not available, skipping save_user_interaction")
+            return 0  # Return a dummy ID to indicate the operation was skipped
+
         try:
             async with self.pool.acquire() as conn:
                 query = """
@@ -285,7 +311,8 @@ class DatabaseManager:
                 return result
         except Exception as e:
             logger.error(f"Error saving user interaction: {e}")
-            raise
+            # Don't raise the exception to avoid breaking the main flow when database is unavailable
+            return 0  # Return a dummy ID to indicate failure
 
     async def save_feedback(
         self,
@@ -308,6 +335,11 @@ class DatabaseManager:
         Returns:
             ID of the inserted record
         """
+        # If pool is not available (connection failed), return early gracefully
+        if not self.pool:
+            logger.warning("Database pool not available, skipping save_feedback")
+            return 0  # Return a dummy ID to indicate the operation was skipped
+
         try:
             if rating < 1 or rating > 5:
                 raise ValueError("Rating must be between 1 and 5")
@@ -332,7 +364,8 @@ class DatabaseManager:
                 return result
         except Exception as e:
             logger.error(f"Error saving feedback: {e}")
-            raise
+            # Don't raise the exception to avoid breaking the main flow when database is unavailable
+            return 0  # Return a dummy ID to indicate failure
 
     async def get_feedback_stats(self, question_id: Optional[int] = None) -> Dict[str, Any]:
         """
@@ -344,6 +377,16 @@ class DatabaseManager:
         Returns:
             Dictionary with feedback statistics
         """
+        # If pool is not available (connection failed), return default stats gracefully
+        if not self.pool:
+            logger.warning("Database pool not available, returning default feedback stats")
+            return {
+                'average_rating': 0,
+                'total_feedback': 0,
+                'helpful_count': 0,
+                'not_helpful_count': 0
+            }
+
         try:
             async with self.pool.acquire() as conn:
                 if question_id:
@@ -376,7 +419,13 @@ class DatabaseManager:
                 }
         except Exception as e:
             logger.error(f"Error getting feedback stats: {e}")
-            raise
+            # Return default stats instead of raising to not break the main flow
+            return {
+                'average_rating': 0,
+                'total_feedback': 0,
+                'helpful_count': 0,
+                'not_helpful_count': 0
+            }
 
     async def save_analytics_metric(
         self,
@@ -393,6 +442,11 @@ class DatabaseManager:
         Returns:
             ID of the inserted record
         """
+        # If pool is not available (connection failed), return early gracefully
+        if not self.pool:
+            logger.warning("Database pool not available, skipping save_analytics_metric")
+            return 0  # Return a dummy ID to indicate the operation was skipped
+
         try:
             async with self.pool.acquire() as conn:
                 query = """
@@ -411,7 +465,8 @@ class DatabaseManager:
                 return result
         except Exception as e:
             logger.error(f"Error saving analytics metric: {e}")
-            raise
+            # Don't raise the exception to avoid breaking the main flow when database is unavailable
+            return 0  # Return a dummy ID to indicate failure
 
     async def get_analytics_metrics(
         self,
