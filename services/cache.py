@@ -30,7 +30,7 @@ class CacheService:
     async def initialize(self):
         """Initialize the cache service, attempting to connect to Redis first."""
         # Check if Redis is explicitly disabled for production
-        redis_enabled = get_config_value('REDIS_ENABLED', 'false').lower() == 'true'
+        redis_enabled = get_config_value('REDIS_ENABLED', 'false') == 'true'
 
         if not redis_enabled:
             print("[CACHE] Using in-memory cache (Redis disabled for serverless deployment)")

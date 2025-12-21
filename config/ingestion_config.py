@@ -138,6 +138,10 @@ def _convert_value_type(value: str) -> Union[str, int, float, bool]:
     if value is None:
         return None
 
+    # Ensure value is a string before processing
+    if not isinstance(value, str):
+        value = str(value)
+
     # Check for boolean values
     if value.lower() in ('true', 'false'):
         return value.lower() == 'true'
