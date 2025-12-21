@@ -138,9 +138,10 @@ app.add_middleware(
 # Include the chat endpoint from the original API
 @app.post("/chat", response_model=QueryResponse)
 async def chat_endpoint(
-    request: QueryRequest,
-    api_key: str = Depends(authenticate_request),
-    rate_limit: str = Depends(check_rate_limit)
+    request: QueryRequest
+    # Removed authentication for public access to the chatbot
+    # api_key: str = Depends(authenticate_request),
+    # rate_limit: str = Depends(check_rate_limit)
 ):
     """
     Main endpoint for processing user questions using RAG.
