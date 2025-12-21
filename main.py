@@ -122,7 +122,11 @@ app = FastAPI(
 # Add CORS middleware to allow requests from Docusaurus frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=[
+        "https://hoath101.github.io",
+        "http://localhost:3000",
+        "https://huggingface.co/spaces/12Hammad/physical-ai-book-backend/"
+    ],  # In production, replace with specific origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

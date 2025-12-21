@@ -54,7 +54,7 @@ const config = {
         enabled: true,
         title: 'Book Assistant',
         initialOpen: false,
-        apiUrl: process.env.REACT_APP_API_URL || 'http://localhost:8000',
+        apiUrl: process.env.REACT_APP_API_URL || 'https://huggingface.co/spaces/12Hammad/physical-ai-book-backend',
         bookId: process.env.DEFAULT_BOOK_ID || 'default-book',
         // Sensitive configuration like client tokens should be handled on the backend
       },
