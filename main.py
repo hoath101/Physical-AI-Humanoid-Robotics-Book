@@ -123,7 +123,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://hoath101.github.io",
+        "https://hoath101.github.io/Physical-AI-Humanoid-Robotics-Book/",
         "http://localhost:3000",
         "https://huggingface.co/spaces/12Hammad/physical-ai-book-backend/"
     ],  # In production, replace with specific origins
